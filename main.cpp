@@ -4,20 +4,20 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "extras.h"
+#include "extras1.h"
 
 /// Estruturas iniciais para armazenar vertices
 //  Você poderá utilizá-las adicionando novos métodos (de acesso por exemplo) ou usar suas próprias estruturas.
 class vertice
 {
-    public:
-        float x,y,z;
+public:
+    float x,y,z;
 };
 
 class triangle
 {
-    public:
-        vertice v[3];
+public:
+    vertice v[3];
 };
 
 /// Globals
@@ -79,48 +79,72 @@ void drawObject()
 {
     vertice vetorNormal;
     vertice v[4] = {{-1.0f, -1.0f,  0.0f},
-                    { 1.0f, -1.0f,  0.0f},
-                    {-1.0f,  1.0f,  0.0f},
-                    { 1.0f,  1.0f, -0.5f}};
+        { 1.0f, -1.0f,  0.0f},
+        {-1.0f,  1.0f,  0.0f},
+        { 1.0f,  1.0f, -0.5f}
+    };
 
     triangle t[2] = {{v[0], v[1], v[2]},
-                     {v[1], v[3], v[2]}};
+        {v[1], v[3], v[2]}
+    };
 
     glBegin(GL_TRIANGLES);
-        for(int i = 0; i < 2; i++) // triangulos
-        {
-            CalculaNormal(t[i], &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-            for(int j = 0; j < 3; j++) // vertices do triangulo
-                glVertex3d(t[i].v[j].x, t[i].v[j].y, t[i].v[j].z);
-        }
+    for(int i = 0; i < 2; i++) // triangulos
+    {
+        CalculaNormal(t[i], &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+        for(int j = 0; j < 3; j++) // vertices do triangulo
+            glVertex3d(t[i].v[j].x, t[i].v[j].y, t[i].v[j].z);
+    }
     glEnd();
+}
+
+void desenhaEixos()
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(-10.0,0.0,0.0);
+    glVertex3f(10.0,0.0,0.0);
+    glEnd();
+
+    glBegin(GL_LINES);
+    glColor3f(0.0,1.0,0.0);
+    glVertex3f(0.0,-10.0,0.0);
+    glVertex3f(0.0,10.0,0.0);
+    glEnd();
+    glEnable(GL_LIGHTING);
 }
 
 void display(void)
 {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport (0, 0, (GLsizei) 400, (GLsizei) 600);
+///--------------Primeira Viewport----------------------------------------------------
+    glViewport (0, 0, (GLsizei) width/2, (GLsizei) height);
     glEnable(GL_SCISSOR_TEST);
-    glScissor(0, 0, (GLsizei) 400, (GLsizei) 600);
+    glScissor(0, 0, (GLsizei) width/2, (GLsizei) height);
     glClearColor(1.0,1.0,1.0,0.0);
-    gluPerspective(60.0, (GLfloat) 800/(GLfloat) 600, 0.01, 200.0);
+    glOrtho(-10,10,-10,10,0,0);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport (400, 0, (GLsizei) 400, (GLsizei) 600);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    desenhaEixos();
 
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+///--------------Segunda Viewport-----------------------------------------------------
+
+    glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height);
+    glClearColor(0.0,0.0,0.0,0.0);
 
     glPushMatrix();
-        glRotatef( rotationY, 0.0, 1.0, 0.0 );
-        glRotatef( rotationX, 1.0, 0.0, 0.0 );
-        drawObject();
+    glRotatef( rotationY, 0.0, 1.0, 0.0 );
+    glRotatef( rotationX, 1.0, 0.0, 0.0 );
+    drawObject();
     glPopMatrix();
 
     glutSwapBuffers();
-
 }
 
 void idle ()
@@ -136,7 +160,11 @@ void reshape (int w, int h)
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluPerspective(60.0, (GLfloat) w/(GLfloat) h, 0.01, 200.0);
+    gluPerspective(60.0, (GLfloat) (w/2)/(GLfloat) h, 0.01, 200.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -144,10 +172,31 @@ void keyboard (unsigned char key, int x, int y)
 
     switch (tolower(key))
     {
-        case 27:
-            exit(0);
-            break;
+    case 27:
+        exit(0);
+        break;
     }
+}
+
+// Special Keys callback
+void specialKeys(int key, int x, int y)
+{
+    switch(key)
+    {
+    case GLUT_KEY_LEFT:
+        ///-------TROCA GRUPOS
+        break;
+    case GLUT_KEY_RIGHT:
+        ///-------TROCA GRUPOS
+        break;
+    case GLUT_KEY_UP:
+        ///-------MUDA ALTURA
+        break;
+    case GLUT_KEY_DOWN:
+        ///-------MUDA ALTURA
+        break;
+    }
+    glutPostRedisplay();
 }
 
 // Motion callback
@@ -192,6 +241,7 @@ int main(int argc, char** argv)
     glutMouseFunc( mouse );
     glutMotionFunc( motion );
     glutKeyboardFunc(keyboard);
+    glutSpecialFunc( specialKeys );
     glutIdleFunc(idle);
     glutMainLoop();
     return 0;
