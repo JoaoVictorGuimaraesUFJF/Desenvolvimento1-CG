@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "glcFPSViewer.h"
 #include "extras1.h"
 
 /// Estruturas iniciais para armazenar vertices
@@ -25,7 +26,8 @@ float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
-
+glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit");
+int altura = 1, grupo = 1;
 
 /// Functions
 void init(void)
@@ -145,6 +147,8 @@ void display(void)
     glPopMatrix();
 
     glutSwapBuffers();
+
+    fpsViewer->drawFPS(grupo, altura);
 }
 
 void idle ()
@@ -184,16 +188,22 @@ void specialKeys(int key, int x, int y)
     switch(key)
     {
     case GLUT_KEY_LEFT:
-        ///-------TROCA GRUPOS
+        if(grupo <= 1)
+            grupo = 1;
+        else
+            grupo -= 1;
         break;
     case GLUT_KEY_RIGHT:
-        ///-------TROCA GRUPOS
+        grupo += 1;
         break;
     case GLUT_KEY_UP:
-        ///-------MUDA ALTURA
+        altura += 1;
         break;
     case GLUT_KEY_DOWN:
-        ///-------MUDA ALTURA
+        if(altura <= 1)
+            altura = 1;
+        else
+            altura -= 1;
         break;
     }
     glutPostRedisplay();
