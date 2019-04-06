@@ -1,0 +1,30 @@
+# depslib dependency file v1.0
+1552594628 source:/ice/CG/CG/src/circle.cpp
+	<windows.h>
+	<GL/glut.h>
+	<math.h>
+
+1552597068 source:/ice/CG/CG/src/quad.cpp
+	<stdio.h>
+	<GL/glut.h>
+
+1554431822 source:/home/joaovictor/cg2019-1/CG/src/main.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<math.h>
+	"extras1.h"
+
+1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
+
+1554561744 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<math.h>
+	"extras1.h"
+
+1554561744 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
+

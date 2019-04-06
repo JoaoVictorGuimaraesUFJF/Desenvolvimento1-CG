@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1535571415 source:/ice/CG/CG/src/animationBase.cpp
+	<GL/glut.h>
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	"extras.h"
+
+1540425854 /ice/CG/CG/src/extras.h
+

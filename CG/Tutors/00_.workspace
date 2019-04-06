@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="primitivesLinux.cbp" />
+		<Project filename="transformationLinux.cbp" />
+		<Project filename="projectionLinux.cbp" />
+		<Project filename="lightpositionLinux.cbp" />
+		<Project filename="lightmaterialLinux.cbp" />
+		<Project filename="textureLinux.cbp" />
+		<Project filename="fogLinux.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

@@ -1,0 +1,7 @@
+Dez/2017 
+
+Descompacte este projeto para que fique no mesmo nível da pasta src do projeto CG.zip.
+
+Este projeto está configurado para ser executado no linux. Para executá-lo no windows, mova os projetos da pasta "windowsProjects" para a pasta principal.
+
+Obs.: no freeglut do windows, os menus do glut podem não funcionar corretamente. Neste caso, utilize os atalhos de teclado
