@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1540502191 source:/ice/CG/CG/src/cameraRotation.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	<ctype.h>
+	"extras.h"
+
+1540425854 /ice/CG/CG/src/extras.h
+

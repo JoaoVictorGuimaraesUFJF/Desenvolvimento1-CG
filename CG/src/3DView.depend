@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1553805410 source:/ice/CG/CG/src/3DView.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+
+1553806644 source:/home/joaovictor/cg2019-1/CG/src/3DView.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+

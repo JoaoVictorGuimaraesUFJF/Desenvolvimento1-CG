@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1535590860 source:/ice/CG/CG/src/projection.cpp
+	<GL/glut.h>
+	<stdio.h>
+	<stdlib.h>
+
