@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1554574379 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1554762871 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -32,7 +32,7 @@
 1554574017 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
 	"glcFPSViewer.h"
 
-1554574017 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcFPSViewer.cpp
+1554574474 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcFPSViewer.cpp
 	"glcFPSViewer.h"
 	<stdio.h>
 	<string.h>

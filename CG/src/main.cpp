@@ -104,19 +104,31 @@ void drawObject()
 void desenhaEixos()
 {
     glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glColor3f(1.0,0.0,0.0);
-    glVertex3f(-10.0,0.0,0.0);
-    glVertex3f(10.0,0.0,0.0);
-    glEnd();
+        glBegin(GL_LINES);
+            glColor3f(1.0,0.0,0.0);
+            glVertex3f(-10.0,0.0,0.0);
+            glVertex3f(10.0,0.0,0.0);
+        glEnd();
 
-    glBegin(GL_LINES);
-    glColor3f(0.0,1.0,0.0);
-    glVertex3f(0.0,-10.0,0.0);
-    glVertex3f(0.0,10.0,0.0);
-    glEnd();
+        glBegin(GL_LINES);
+            glColor3f(0.0,1.0,0.0);
+            glVertex3f(0.0,-10.0,0.0);
+            glVertex3f(0.0,10.0,0.0);
+        glEnd();
     glEnable(GL_LIGHTING);
 }
+
+
+void desenhaPonto2D(int x, int y){
+    glDisable(GL_LIGHTING);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glBegin(GL_POINTS);
+            glVertex2i(x, y);
+            glutWireCube(0.5);
+        glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 
 void display(void)
 {
@@ -129,8 +141,12 @@ void display(void)
     glClearColor(1.0,1.0,1.0,0.0);
     glOrtho(-10,10,-10,10,0,0);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
     desenhaEixos();
+    //desenhaPonto2D(last_x,last_y);
+
+
 
 
 ///--------------Segunda Viewport-----------------------------------------------------
@@ -168,7 +184,8 @@ void reshape (int w, int h)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+//    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -226,14 +243,20 @@ void mouse(int button, int state, int x, int y)
     {
         last_x = x;
         last_y = y;
+        printf("Pressionado em (%d, %d)\n", x,y);
+
+    }
+    if ( button == GLUT_RIGHT_BUTTON)
+    {
+        ///REMOVE O ULTIMO PONTO
     }
     if(button == 3) // Scroll up
     {
-        zdist+=1.0f;
+        //zdist+=1.0f;
     }
     if(button == 4) // Scroll Down
     {
-        zdist-=1.0f;
+        //zdist-=1.0f;
     }
 }
 
