@@ -134,6 +134,11 @@ void display(void)
 {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0);
+    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
 ///--------------Primeira Viewport----------------------------------------------------
     glViewport (0, 0, (GLsizei) width/2, (GLsizei) height);
     glEnable(GL_SCISSOR_TEST);
@@ -141,9 +146,9 @@ void display(void)
     glClearColor(1.0,1.0,1.0,0.0);
     glOrtho(-10,10,-10,10,0,0);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
     desenhaEixos();
+
     //desenhaPonto2D(last_x,last_y);
 
 
@@ -178,14 +183,6 @@ void reshape (int w, int h)
     height = h;
 
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective(60.0, (GLfloat) (w/2)/(GLfloat) h, 0.01, 200.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-//    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -252,11 +249,11 @@ void mouse(int button, int state, int x, int y)
     }
     if(button == 3) // Scroll up
     {
-        //zdist+=1.0f;
+        zdist+=1.0f;
     }
     if(button == 4) // Scroll Down
     {
-        //zdist-=1.0f;
+        zdist-=1.0f;
     }
 }
 

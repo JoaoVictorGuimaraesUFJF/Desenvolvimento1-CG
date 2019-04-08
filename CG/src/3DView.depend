@@ -11,3 +11,9 @@
 	<stdio.h>
 	<ctype.h>
 
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/3DView.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+
