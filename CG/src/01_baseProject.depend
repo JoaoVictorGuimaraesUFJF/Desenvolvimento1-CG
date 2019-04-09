@@ -18,16 +18,18 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1554764261 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1554842901 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
 	<ctype.h>
 	<math.h>
+	<stack>
+	<list>
 	"glcFPSViewer.h"
 	"extras1.h"
 
-1554572902 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
+1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
 
 1554574017 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
 	"glcFPSViewer.h"

@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcShader.cpp
+	"glcShader.h"
+	<iostream>
+	<string.h>
+
+1554572902 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcShader.h
+	<stdio.h>
+	<stdlib.h>
+	<string>
+	<GL/glew.h>
+
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/shaderExample.cpp
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<GL/glew.h>
+	<GL/glut.h>
+	"glcShader.h"
+

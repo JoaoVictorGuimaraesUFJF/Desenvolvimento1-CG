@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <math.h>
+#include <stack>
+#include <list>
 
 #include "glcFPSViewer.h"
 #include "extras1.h"
@@ -13,6 +15,14 @@ class vertice
 {
 public:
     float x,y,z;
+};
+
+class ponto
+{
+public:
+    float x,y;
+    float getX() {return x;}
+    float getY() {return y;}
 };
 
 class triangle
@@ -28,6 +38,9 @@ int   last_x, last_y;
 int   width, height;
 glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit");
 int altura = 1, grupo = 1;
+std::stack<ponto> pilha;
+//std::list<std::stack<ponto>> listaPontos;
+
 
 /// Functions
 void init(void)
@@ -106,14 +119,14 @@ void desenhaEixos()
     glDisable(GL_LIGHTING);
         glBegin(GL_LINES);
             glColor3f(1.0,0.0,0.0);
-            glVertex3f(-10.0,0.0,0.0);
-            glVertex3f(10.0,0.0,0.0);
+            glVertex3f(-100.0,0.0,0.0);
+            glVertex3f(100.0,0.0,0.0);
         glEnd();
 
         glBegin(GL_LINES);
             glColor3f(0.0,1.0,0.0);
-            glVertex3f(0.0,-10.0,0.0);
-            glVertex3f(0.0,10.0,0.0);
+            glVertex3f(0.0,-100.0,0.0);
+            glVertex3f(0.0,100.0,0.0);
         glEnd();
     glEnable(GL_LIGHTING);
 }
@@ -123,8 +136,7 @@ void desenhaPonto2D(int x, int y){
     glDisable(GL_LIGHTING);
         glColor3f(1.0f, 0.0f, 0.0f);
         glBegin(GL_POINTS);
-            glVertex2i(x, y);
-            glutWireCube(0.5);
+            glVertex3f(x,y,0.0);
         glEnd();
     glEnable(GL_LIGHTING);
 }
@@ -144,14 +156,20 @@ void display(void)
     glEnable(GL_SCISSOR_TEST);
     glScissor(0, 0, (GLsizei) width/2, (GLsizei) height);
     glClearColor(1.0,1.0,1.0,0.0);
-    glOrtho(-10,10,-10,10,0,0);
+    glMatrixMode (GL_PROJECTION);
+    glOrtho(-1,1,-1,1,0,0);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode (GL_MODELVIEW);
 
     desenhaEixos();
 
-    //desenhaPonto2D(last_x,last_y);
-
-
+        glPushMatrix();
+        glPointSize(10.0);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glBegin(GL_POINTS);
+            glVertex2f(0,0);
+        glEnd();
+        glPopMatrix();
 
 
 ///--------------Segunda Viewport-----------------------------------------------------
@@ -238,10 +256,19 @@ void mouse(int button, int state, int x, int y)
 {
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
     {
-        last_x = x;
-        last_y = y;
-        printf("Pressionado em (%d, %d)\n", x,y);
+        if(x<=width/2){
+            last_x = x;
+            last_y = y;
+            printf("Pressionado em (%d, %d)\n", x,y);
+            ponto p;
+            p.x=x; p.y=y;
+//            std::list<std::stack<ponto>>::iterator it = listaPontos.begin()+grupo;
+//            pilha = *it;
+            pilha.push(p);
+//            listaPontos.insert(listaPontos.begin()+grupo,pilha);
 
+        }
+//        printf("Ponto na posição %d da lista (%f %f) \n", );
     }
     if ( button == GLUT_RIGHT_BUTTON)
     {
