@@ -30,7 +30,6 @@ int   last_x, last_y;
 int   width, height;
 glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit");
 int altura = 1, grupo = 1;
-//std::vector<vertice> pilhaGrupo;
 std::vector< std::vector<vertice> > vetorVertice;
 
 
@@ -85,23 +84,40 @@ void CalculaNormal(triangle t, vertice *vn)
 void drawObject()
 {
     vertice vetorNormal;
-    vertice v[4] = {{-1.0f, -1.0f,  0.0f},
+    int i=0;
+    /*vertice v[8] = {{-1.0f, -1.0f,  0.0f},
         { 1.0f, -1.0f,  0.0f},
         {-1.0f,  1.0f,  0.0f},
-        { 1.0f,  1.0f, -0.5f}
-    };
+        { 1.0f,  1.0f, -0.5f},
+        { 0.3f,  0.3f,  1.5f},
+        { -0.3f,  -0.3f,  1.5f},
+        { 0.3f,  -0.3f,  1.5f},
+        { -0.3f,  0.3f,  2.0f}
+    };*/
 
-    triangle t[2] = {{v[0], v[1], v[2]},
-        {v[1], v[3], v[2]}
-    };
+    std::vector<triangle> triangulos;
+    if(triangulos.size()!=0)
+        i = vetorVertice.at(grupo).size();
+    if(i >= 3){
+        triangle tri = {{vetorVertice.at(grupo).at(i-2), vetorVertice.at(grupo).at(i-1), vetorVertice.at(grupo).at(i)}};
+        triangulos.push_back(tri);
+    }
+
+    /*triangle t[6] = {{v[0], v[1], v[2]},
+        {v[1], v[3], v[2]},
+        {v[3], v[4], v[2]},
+        {v[4], v[5], v[3]},
+        {v[5], v[6], v[4]},
+        {v[6], v[7], v[5]}
+    };*/
 
     glBegin(GL_TRIANGLES);
-    for(int i = 0; i < 2; i++) // triangulos
+    for(int i = 0; i < triangulos.size(); i++) // triangulos
     {
-        CalculaNormal(t[i], &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
         glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
         for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(t[i].v[j].x, t[i].v[j].y, t[i].v[j].z);
+            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
     }
     glEnd();
 }
@@ -126,6 +142,7 @@ void desenhaEixos()
 
 void desenhaPonto2D(vertice v)
 {
+    glDisable(GL_LIGHTING);
     float x=(((float)v.x*4)/(float)width)-1;
     float y=(((float)v.y*2)/(float)height)-1;
     //float x=v.x;
@@ -135,6 +152,8 @@ void desenhaPonto2D(vertice v)
     glBegin(GL_POINTS);
         glVertex2f(x,y);
     glEnd();
+glEnable(GL_LIGHTING);
+
 }
 
 void desenhaPontos()
@@ -267,8 +286,6 @@ void mouse(int button, int state, int x, int y)
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
     {
         if(x<=width/2){
-            last_x = x;
-            last_y = y;
             printf("Pressionado em (%d, %d)\n", x,y);
             vertice v;
             v.x=x; v.y=y; v.z= (float) altura;
@@ -276,13 +293,13 @@ void mouse(int button, int state, int x, int y)
             {
                 vetorVertice.resize(grupo);
             }
-            //pilhaGrupo.push_back(v);
             vetorVertice.at(grupo-1).push_back(v);
-
         }
-            printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
+        last_x = x;
+        last_y = y;
+        printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
     }
-    if ( button == GLUT_RIGHT_BUTTON)
+    if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
     {
         excluirPonto(grupo);
     }
