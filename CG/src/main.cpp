@@ -83,59 +83,40 @@ void CalculaNormal(triangle t, vertice *vn)
 void drawObject()
 {
     vertice vetorNormal;
-    vertice v[8] = {{-1.0f, -1.0f,  0.0f},
-        { 1.0f, -1.0f,  0.0f},
-        {-1.0f,  1.0f,  0.0f},
-        { 1.0f,  1.0f, -0.5f},
-        { 0.3f,  0.3f,  1.5f},
-        { -0.3f,  -0.3f,  1.5f},
-        { 0.3f,  -0.3f,  1.5f},
-        { -0.3f,  0.3f,  2.0f}
-    };
+    std::vector<triangle> triangulos; //vetor para armazenar triângulos
 
-//    std::vector<triangle> triangulos;
-//
-//    for(int i=0; i<vetorVertice.size(); i++)
-//    {
-//        if(!vetorVertice.at(i).empty())
-//        {
-//            for(int j=3; j<vetorVertice.at(i).size(); j++){
-//
-//                if(vetorVertice.at(i).size() > 3){
-//                    triangle tri = {{vetorVertice.at(i).at(j-2), vetorVertice.at(i).at(j-1), vetorVertice.at(i).at(j)}};
-//                    triangulos.push_back(tri);
-//                }
-//            }
-//        }
-//    }
-
-    triangle t[6] = {{v[0], v[1], v[2]},
-        {v[1], v[3], v[2]},
-        {v[3], v[4], v[2]},
-        {v[4], v[5], v[3]},
-        {v[5], v[6], v[4]},
-        {v[6], v[7], v[5]}
-    };
-//
-//    glBegin(GL_TRIANGLES);
-//    for(int i = 0; i < triangulos.size(); i++) // triangulos
-//    {
-//        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-//        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-//        for(int j = 0; j < 3; j++) // vertices do triangulo
-//            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
-//    }
-//    glEnd();
+    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    {
+        if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        {
+            for(int j=1; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+            {
+                triangle tri;
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+            }
+        }
+    }
 
     glBegin(GL_TRIANGLES);
-    for(int i = 0; i < 6; i++) // triangulos
+    for(int i = 0; i < triangulos.size(); i++) // triangulos
     {
-        CalculaNormal(t[i], &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
         glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
         for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(t[i].v[j].x,t[i].v[j].y, t[i].v[j].z);
+            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
     }
     glEnd();
+
 }
 
 void desenhaEixos() //Desenha os eixos
@@ -159,9 +140,8 @@ void desenhaEixos() //Desenha os eixos
 void desenhaPonto2D(vertice v) //Função auxiliar de desenho
 {
     glDisable(GL_LIGHTING);
-        float x=(((float)v.x*4)/(float)width)-1; //Normalização da coordenada X
-        float y=((((float)v.y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
-        //printf("Valor renderizado (%.1f, %.1f)\n", x,y);
+        float x=v.x;
+        float y=v.y;
         glPointSize(10.0); //Define o tamanho do ponto
         glColor3f(1.0f, 0.0f, 0.0f); //Define cor do ponto
         glBegin(GL_POINTS);
@@ -308,9 +288,10 @@ void mouse(int button, int state, int x, int y)
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
     {
         if(x<=width/2){
-            printf("Pressionado em (%d, %d)\n", x,y);
             vertice v;
-            v.x=x; v.y=y; v.z = (float) altura;
+            v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
+            v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
+            v.z = (float) altura;
             if(vetorVertice.size() < grupo)
             {
                 vetorVertice.resize(grupo);
@@ -322,6 +303,10 @@ void mouse(int button, int state, int x, int y)
     }
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
     {
+        if(vetorVertice.size() < grupo)
+        {
+            vetorVertice.resize(grupo);
+        }
         excluirPonto(grupo);
     }
     if(button == 3) // Scroll up
