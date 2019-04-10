@@ -106,9 +106,7 @@ void drawObject()
 //                    triangle tri = {{vetorVertice.at(i).at(j-2), vetorVertice.at(i).at(j-1), vetorVertice.at(i).at(j)}};
 //                    triangulos.push_back(tri);
 //                }
-//
 //            }
-//
 //        }
 //    }
 
@@ -164,6 +162,7 @@ void desenhaPonto2D(vertice v)
     glDisable(GL_LIGHTING);
     float x=(((float)v.x*4)/(float)width)-1;
     float y=((((float)v.y*2)/(float)height)-1)*-1;
+    printf("Valor renderizado (%.1f, %.1f)\n", x,y);
 //    float x=v.x;
 //    float y=v.y;
     glPointSize(10.0);
@@ -201,22 +200,20 @@ void display(void)
 {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0);
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-
 ///--------------Primeira Viewport----------------------------------------------------
     glViewport (0, 0, (GLsizei) width/2, (GLsizei) height);
     glEnable(GL_SCISSOR_TEST);
     glScissor(0, 0, (GLsizei) width/2, (GLsizei) height);
     glClearColor(1.0,1.0,1.0,0.0);
     glMatrixMode (GL_PROJECTION);
-    glOrtho(-1,1,-1,1,0,0);
+    glLoadIdentity ();
+    glOrtho(-1,1,-1,1,-1,1);
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity ();
 
     desenhaEixos();
+    glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
     desenhaPontos();
 
 
@@ -226,6 +223,16 @@ void display(void)
     glEnable(GL_SCISSOR_TEST);
     glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height);
     glClearColor(0.0,0.0,0.0,0.0);
+
+    glMatrixMode (GL_PROJECTION);
+    glLoadIdentity ();
+    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0);
+
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+
 
     glPushMatrix();
     glRotatef( rotationY, 0.0, 1.0, 0.0 );
@@ -307,7 +314,7 @@ void mouse(int button, int state, int x, int y)
         if(x<=width/2){
             printf("Pressionado em (%d, %d)\n", x,y);
             vertice v;
-            v.x=x; v.y=y; v.z= (float) altura;
+            v.x=x; v.y=y; v.z = (float) altura;
             if(vetorVertice.size() < grupo)
             {
                 vetorVertice.resize(grupo);
@@ -337,7 +344,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize (800, 600);
+    glutInitWindowSize (800, 400);
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
     init ();
