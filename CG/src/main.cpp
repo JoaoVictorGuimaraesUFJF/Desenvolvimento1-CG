@@ -84,8 +84,7 @@ void CalculaNormal(triangle t, vertice *vn)
 void drawObject()
 {
     vertice vetorNormal;
-    int i=0;
-    /*vertice v[8] = {{-1.0f, -1.0f,  0.0f},
+    vertice v[8] = {{-1.0f, -1.0f,  0.0f},
         { 1.0f, -1.0f,  0.0f},
         {-1.0f,  1.0f,  0.0f},
         { 1.0f,  1.0f, -0.5f},
@@ -93,31 +92,51 @@ void drawObject()
         { -0.3f,  -0.3f,  1.5f},
         { 0.3f,  -0.3f,  1.5f},
         { -0.3f,  0.3f,  2.0f}
-    };*/
+    };
 
-    std::vector<triangle> triangulos;
-    if(triangulos.size()!=0)
-        i = vetorVertice.at(grupo).size();
-    if(i >= 3){
-        triangle tri = {{vetorVertice.at(grupo).at(i-2), vetorVertice.at(grupo).at(i-1), vetorVertice.at(grupo).at(i)}};
-        triangulos.push_back(tri);
-    }
+//    std::vector<triangle> triangulos;
+//
+//    for(int i=0; i<vetorVertice.size(); i++)
+//    {
+//        if(!vetorVertice.at(i).empty())
+//        {
+//            for(int j=3; j<vetorVertice.at(i).size(); j++){
+//
+//                if(vetorVertice.at(i).size() > 3){
+//                    triangle tri = {{vetorVertice.at(i).at(j-2), vetorVertice.at(i).at(j-1), vetorVertice.at(i).at(j)}};
+//                    triangulos.push_back(tri);
+//                }
+//
+//            }
+//
+//        }
+//    }
 
-    /*triangle t[6] = {{v[0], v[1], v[2]},
+    triangle t[6] = {{v[0], v[1], v[2]},
         {v[1], v[3], v[2]},
         {v[3], v[4], v[2]},
         {v[4], v[5], v[3]},
         {v[5], v[6], v[4]},
         {v[6], v[7], v[5]}
-    };*/
+    };
+//
+//    glBegin(GL_TRIANGLES);
+//    for(int i = 0; i < triangulos.size(); i++) // triangulos
+//    {
+//        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+//        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+//        for(int j = 0; j < 3; j++) // vertices do triangulo
+//            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
+//    }
+//    glEnd();
 
     glBegin(GL_TRIANGLES);
-    for(int i = 0; i < triangulos.size(); i++) // triangulos
+    for(int i = 0; i < 6; i++) // triangulos
     {
-        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        CalculaNormal(t[i], &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
         glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
         for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
+            glVertex3d(t[i].v[j].x,t[i].v[j].y, t[i].v[j].z);
     }
     glEnd();
 }
@@ -144,9 +163,9 @@ void desenhaPonto2D(vertice v)
 {
     glDisable(GL_LIGHTING);
     float x=(((float)v.x*4)/(float)width)-1;
-    float y=(((float)v.y*2)/(float)height)-1;
-    //float x=v.x;
-    //float y=v.y;
+    float y=((((float)v.y*2)/(float)height)-1)*-1;
+//    float x=v.x;
+//    float y=v.y;
     glPointSize(10.0);
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_POINTS);
@@ -297,7 +316,7 @@ void mouse(int button, int state, int x, int y)
         }
         last_x = x;
         last_y = y;
-        printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
+//        printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
     }
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
     {
