@@ -28,10 +28,9 @@ float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
-glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit");
-int altura = 1, grupo = 1;
-std::vector< std::vector<vertice> > vetorVertice;
-
+glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit"); //Titulo da Janela
+int altura = 1, grupo = 1; //Variaveis
+std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
 /// Functions
 void init(void)
@@ -139,7 +138,7 @@ void drawObject()
     glEnd();
 }
 
-void desenhaEixos()
+void desenhaEixos() //Desenha os eixos
 {
     glDisable(GL_LIGHTING);
         glBegin(GL_LINES);
@@ -157,24 +156,22 @@ void desenhaEixos()
 }
 
 
-void desenhaPonto2D(vertice v)
+void desenhaPonto2D(vertice v) //Função auxiliar de desenho
 {
     glDisable(GL_LIGHTING);
-    float x=(((float)v.x*4)/(float)width)-1;
-    float y=((((float)v.y*2)/(float)height)-1)*-1;
-    printf("Valor renderizado (%.1f, %.1f)\n", x,y);
-//    float x=v.x;
-//    float y=v.y;
-    glPointSize(10.0);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_POINTS);
-        glVertex2f(x,y);
-    glEnd();
-glEnable(GL_LIGHTING);
+        float x=(((float)v.x*4)/(float)width)-1; //Normalização da coordenada X
+        float y=((((float)v.y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
+        //printf("Valor renderizado (%.1f, %.1f)\n", x,y);
+        glPointSize(10.0); //Define o tamanho do ponto
+        glColor3f(1.0f, 0.0f, 0.0f); //Define cor do ponto
+        glBegin(GL_POINTS);
+            glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
+        glEnd();
+    glEnable(GL_LIGHTING);
 
 }
 
-void desenhaPontos()
+void desenhaPontos() //Desenha os pontos
 {
     for(int i=0; i<vetorVertice.size(); i++)
     {
@@ -182,67 +179,66 @@ void desenhaPontos()
         {
             for(int j=0; j<vetorVertice.at(i).size(); j++)
             {
-                desenhaPonto2D(vetorVertice.at(i).at(j));
+                desenhaPonto2D(vetorVertice.at(i).at(j)); //Desenha o ponto em 2D
             }
         }
     }
 }
 
-void excluirPonto(int grupo)
+void excluirPonto(int grupo) //Apaga os pontos
 {
     if(!vetorVertice.at(grupo-1).empty())
     {
-        vetorVertice.at(grupo-1).pop_back();
+        vetorVertice.at(grupo-1).pop_back(); // Remove o ultimo elemento do vetor
     }
 }
 
 void display(void)
 {
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
 ///--------------Primeira Viewport----------------------------------------------------
-    glViewport (0, 0, (GLsizei) width/2, (GLsizei) height);
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(0, 0, (GLsizei) width/2, (GLsizei) height);
-    glClearColor(1.0,1.0,1.0,0.0);
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glOrtho(-1,1,-1,1,-1,1);
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
+    glViewport (0, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
+    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
+    glScissor(0, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
+    glClearColor(1.0,1.0,1.0,0.0); //Define cor de fundo da viewport
+    glMatrixMode (GL_PROJECTION); //Matriz de projeção
+    glLoadIdentity (); //Matriz identidade
+    glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f); //Define uma região de visualização ortogonal
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
+    glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
+    glLoadIdentity(); //Matriz identidade
 
-    desenhaEixos();
+    desenhaEixos(); //Desenha os eixos em 2D
     glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
-    desenhaPontos();
+    desenhaPontos(); //Desenha os pontos no 2D
 
 
 ///--------------Segunda Viewport-----------------------------------------------------
 
-    glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height);
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height);
-    glClearColor(0.0,0.0,0.0,0.0);
+    glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
+    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
+    glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
+    glClearColor(0.0,0.0,0.0,0.0); //Define cor de fundo da viewport
 
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0);
+    glMatrixMode (GL_PROJECTION); //Matriz de projeção
+    glLoadIdentity (); //Matriz identidade
+    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
 
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
+    glLoadIdentity(); //Matriz identidade
+    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
 
 
 
-    glPushMatrix();
-    glRotatef( rotationY, 0.0, 1.0, 0.0 );
-    glRotatef( rotationX, 1.0, 0.0, 0.0 );
-    drawObject();
-    glPopMatrix();
+    glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
+        glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+        glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+        drawObject(); //Desenha o objeto em 3D
+    glPopMatrix(); //Descarta a matriz no topo da pilha
 
-    glutSwapBuffers();
+    glutSwapBuffers(); //Troca os buffers
 
-    fpsViewer->drawFPS(grupo, altura);
+    fpsViewer->drawFPS(grupo, altura); //Define o titulo na janela
 }
 
 void idle ()
@@ -323,7 +319,6 @@ void mouse(int button, int state, int x, int y)
         }
         last_x = x;
         last_y = y;
-//        printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
     }
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
     {
