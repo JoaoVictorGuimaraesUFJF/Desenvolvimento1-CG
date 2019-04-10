@@ -13,16 +13,16 @@
 	<GL/glut.h>
 	<glcFPSViewer.h>
 
-1554561744 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcFPSViewer.cpp
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcFPSViewer.cpp
 	"glcFPSViewer.h"
 	<stdio.h>
 	<string.h>
 	<GL/glut.h>
 
-1554561744 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcFPSViewer.h
+1554572902 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/shared/glcFPSViewer.h
 	"glcFPSViewer.h"
 
-1554561744 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/AnimatedTriangle.cpp
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/AnimatedTriangle.cpp
 	<iostream>
 	<GL/glut.h>
 	<glcFPSViewer.h>

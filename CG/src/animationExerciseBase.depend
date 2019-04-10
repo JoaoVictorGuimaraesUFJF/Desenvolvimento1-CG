@@ -8,3 +8,12 @@
 
 1540425854 /ice/CG/CG/src/extras.h
 
+1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/animationBase.cpp
+	<GL/glut.h>
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	"extras.h"
+
+1554572902 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
+
