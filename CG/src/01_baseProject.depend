@@ -40,3 +40,25 @@
 	<string.h>
 	<GL/glut.h>
 
+1554763702 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcFPSViewer.cpp
+	"glcFPSViewer.h"
+	<stdio.h>
+	<string.h>
+	<GL/glut.h>
+
+1554763702 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
+	"glcFPSViewer.h"
+
+1554900058 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<ctype.h>
+	<math.h>
+	<stack>
+	<vector>
+	"glcFPSViewer.h"
+	"extras1.h"
+
+1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
+

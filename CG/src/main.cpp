@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <stack>
-#include <list>
+#include <vector>
 
 #include "glcFPSViewer.h"
 #include "extras1.h"
@@ -15,14 +15,6 @@ class vertice
 {
 public:
     float x,y,z;
-};
-
-class ponto
-{
-public:
-    float x,y;
-    float getX() {return x;}
-    float getY() {return y;}
 };
 
 class triangle
@@ -38,8 +30,8 @@ int   last_x, last_y;
 int   width, height;
 glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit");
 int altura = 1, grupo = 1;
-std::stack<ponto> pilha;
-//std::list<std::stack<ponto>> listaPontos;
+//std::vector<vertice> pilhaGrupo;
+std::vector< std::vector<vertice> > vetorVertice;
 
 
 /// Functions
@@ -132,15 +124,40 @@ void desenhaEixos()
 }
 
 
-void desenhaPonto2D(int x, int y){
-    glDisable(GL_LIGHTING);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glBegin(GL_POINTS);
-            glVertex3f(x,y,0.0);
-        glEnd();
-    glEnable(GL_LIGHTING);
+void desenhaPonto2D(vertice v)
+{
+    float x=(((float)v.x*4)/(float)width)-1;
+    float y=(((float)v.y*2)/(float)height)-1;
+    //float x=v.x;
+    //float y=v.y;
+    glPointSize(10.0);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_POINTS);
+        glVertex2f(x,y);
+    glEnd();
 }
 
+void desenhaPontos()
+{
+    for(int i=0; i<vetorVertice.size(); i++)
+    {
+        if(!vetorVertice.at(i).empty())
+        {
+            for(int j=0; j<vetorVertice.at(i).size(); j++)
+            {
+                desenhaPonto2D(vetorVertice.at(i).at(j));
+            }
+        }
+    }
+}
+
+void excluirPonto(int grupo)
+{
+    if(!vetorVertice.at(grupo-1).empty())
+    {
+        vetorVertice.at(grupo-1).pop_back();
+    }
+}
 
 void display(void)
 {
@@ -162,14 +179,7 @@ void display(void)
     glMatrixMode (GL_MODELVIEW);
 
     desenhaEixos();
-
-        glPushMatrix();
-        glPointSize(10.0);
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glBegin(GL_POINTS);
-            glVertex2f(0,0);
-        glEnd();
-        glPopMatrix();
+    desenhaPontos();
 
 
 ///--------------Segunda Viewport-----------------------------------------------------
@@ -260,19 +270,21 @@ void mouse(int button, int state, int x, int y)
             last_x = x;
             last_y = y;
             printf("Pressionado em (%d, %d)\n", x,y);
-            ponto p;
-            p.x=x; p.y=y;
-//            std::list<std::stack<ponto>>::iterator it = listaPontos.begin()+grupo;
-//            pilha = *it;
-            pilha.push(p);
-//            listaPontos.insert(listaPontos.begin()+grupo,pilha);
+            vertice v;
+            v.x=x; v.y=y; v.z= (float) altura;
+            if(vetorVertice.size() < grupo)
+            {
+                vetorVertice.resize(grupo);
+            }
+            //pilhaGrupo.push_back(v);
+            vetorVertice.at(grupo-1).push_back(v);
 
         }
-//        printf("Ponto na posição %d da lista (%f %f) \n", );
+            printf("Ponto na posição %d do vetor (%f %f) \n", grupo-1, vetorVertice.at(grupo-1).back().x, vetorVertice.at(grupo-1).back().y);
     }
     if ( button == GLUT_RIGHT_BUTTON)
     {
-        ///REMOVE O ULTIMO PONTO
+        excluirPonto(grupo);
     }
     if(button == 3) // Scroll up
     {
