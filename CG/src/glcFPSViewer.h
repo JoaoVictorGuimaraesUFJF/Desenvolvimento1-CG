@@ -42,7 +42,7 @@ class glcFPSViewer
         glcFPSViewer(char *suf, char *pre);
         void setSuffix(char *);
         void setPrefix(char *);
-        void drawFPS(int grupo, int altura);
+        void drawFPS(int grupo, int altura, int espessura);
 };
 
 #endif

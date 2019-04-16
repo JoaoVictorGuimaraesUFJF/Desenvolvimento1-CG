@@ -38,9 +38,9 @@ void glcFPSViewer::setPrefix(char *pre)
 }
 
 // Compute and show FPS
-void glcFPSViewer::drawFPS(int grupo, int altura)
+void glcFPSViewer::drawFPS(int grupo, int altura, int espessura)
 {
-    char aux[16];
+    char aux[32];
     static char fpsBuf[256] = {0};
     static int frames = 0;
     static int t0 = 0;
@@ -49,7 +49,7 @@ void glcFPSViewer::drawFPS(int grupo, int altura)
     if (t - t0 >= 1000)
     {
 
-        sprintf(aux, "Grupo: %i, Altura: %i", grupo, altura);
+        sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i", grupo, altura, espessura);
 
         strcpy(fpsBuf, this->suffix);
         strcat(fpsBuf, aux);

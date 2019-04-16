@@ -15,6 +15,7 @@ class vertice
 {
 public:
     float x,y,z;
+    int espessura;
 };
 
 class triangle
@@ -29,7 +30,7 @@ float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
 glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit"); //Titulo da Janela
-int altura = 1, grupo = 1; //Variaveis
+int altura = 1, grupo = 1, espessura = 1; //Variaveis
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
 /// Functions
@@ -218,7 +219,7 @@ void display(void)
 
     glutSwapBuffers(); //Troca os buffers
 
-    fpsViewer->drawFPS(grupo, altura); //Define o titulo na janela
+    fpsViewer->drawFPS(grupo, altura, espessura); //Define o titulo na janela
 }
 
 void idle ()
@@ -241,6 +242,21 @@ void keyboard (unsigned char key, int x, int y)
     {
     case 27:
         exit(0);
+        break;
+    case '.':
+        espessura += 1;
+        break;
+    case ',':
+        if(espessura <= 1)
+            espessura = 1;
+        else
+            espessura -= 1;
+        break;
+    case 'l':
+        //carregar
+        break;
+    case 's':
+        //salvar
         break;
     }
 }
@@ -268,6 +284,9 @@ void specialKeys(int key, int x, int y)
         else
             altura -= 1;
         break;
+    case GLUT_KEY_F12:
+        //tela cheia
+        break;
     }
     glutPostRedisplay();
 }
@@ -292,6 +311,7 @@ void mouse(int button, int state, int x, int y)
             v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
             v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
             v.z = (float) altura;
+            v.espessura = espessura;
             if(vetorVertice.size() < grupo)
             {
                 vetorVertice.resize(grupo);
