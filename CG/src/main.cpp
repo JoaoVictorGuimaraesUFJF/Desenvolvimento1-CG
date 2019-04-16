@@ -1,13 +1,13 @@
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <math.h>
 #include <stack>
 #include <vector>
 
-#include "glcFPSViewer.h"
-#include "extras1.h"
+#include "extras.h"
 
 /// Estruturas iniciais para armazenar vertices
 //  Você poderá utilizá-las adicionando novos métodos (de acesso por exemplo) ou usar suas próprias estruturas.
@@ -29,8 +29,8 @@ float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
-glcFPSViewer *fpsViewer = new glcFPSViewer((char*) "Desenvolvimento 1 - ", (char*) " - Press ESC to Exit"); //Titulo da Janela
 int altura = 1, grupo = 1, espessura = 1; //Variaveis
+bool fullScreen = false;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
 /// Functions
@@ -79,6 +79,21 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->x /= len;
     vn->y /= len;
     vn->z /= len;
+}
+
+void showMenu(){
+    printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
+    printf("Use as setas DIREITA/ESQUERDA para alterar o grupo.\n");
+    printf("Use as setas CIMA/BAIXO para alterar a altura.\n");
+    printf("Use '.' ou ',' para alterar a espessura.\n");
+    printf("Use 's' para salvar o modelo.\n");
+    printf("Use 'l' para carregar um modelo.\n");
+    printf("Use F12 para colocar em fullscreen.\n");
+    printf("Use o scroll do mouse para zoom.\n");
+    printf("Use o botão ESQUERDO do mouse para ADICIONAR pontos no 2D.\n");
+    printf("Use o botão DIREITO do mouse para REMOVER pontos no 2D.\n");
+    printf("Clique e arraste o mouse para rotacionar o modelo gerado em 3D.\n");
+    printf("Use ESC para sair.\n");
 }
 
 void drawObject()
@@ -174,6 +189,17 @@ void excluirPonto(int grupo) //Apaga os pontos
     }
 }
 
+void imprimeTitulo(int grupo, int altura, int espessura)
+{
+    char aux[32];
+    static char fpsBuf[256] = {0};
+    sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i ", grupo, altura,espessura);
+    strcpy(fpsBuf, "Desenvolvimento 1 - ");
+    strcat(fpsBuf, aux);
+    strcat(fpsBuf, "- Press ESC to exit.");
+    glutSetWindowTitle(fpsBuf);
+}
+
 void display(void)
 {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
@@ -219,7 +245,7 @@ void display(void)
 
     glutSwapBuffers(); //Troca os buffers
 
-    fpsViewer->drawFPS(grupo, altura, espessura); //Define o titulo na janela
+    imprimeTitulo(grupo, altura, espessura);
 }
 
 void idle ()
@@ -285,7 +311,8 @@ void specialKeys(int key, int x, int y)
             altura -= 1;
         break;
     case GLUT_KEY_F12:
-        //tela cheia
+        (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
+        fullScreen = !fullScreen;
         break;
     }
     glutPostRedisplay();
@@ -347,6 +374,7 @@ int main(int argc, char** argv)
     glutInitWindowSize (800, 400);
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
+    showMenu();
     init ();
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
