@@ -14,7 +14,7 @@
 class vertice
 {
 public:
-    float x,y,z;
+    float x,y,z,x0,x1,y0,y1;
     int espessura;
 };
 
@@ -30,6 +30,7 @@ float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
 int altura = 1, grupo = 1, espessura = 1; //Variaveis
+vertice vetorOrtogonal;
 bool fullScreen = false;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
@@ -81,6 +82,25 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->z /= len;
 }
 
+void CalculaOrtogonal(vertice v0, vertice v1, vertice *vo)
+{
+    vertice temp;
+
+    /* Encontra vetor v */
+    temp.x = v1.x - v0.x;
+    temp.y = v1.y - v0.y;
+
+    /* Calculo do produto vetorial de v1 e v2 */
+    vo->x = -temp.y;
+    vo->y = temp.x;
+
+    // Normaliza vetor
+    float tam = sqrt( pow( (v0.x-v1.x)/2 - vo->x,2) + pow( (v0.y-v1.y)/2 - vo->y,2) );
+    vo->x /= tam;
+    vo->y /= tam;
+
+}
+
 void showMenu(){
     printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
     printf("Use as setas DIREITA/ESQUERDA para alterar o grupo.\n");
@@ -113,12 +133,79 @@ void drawObject()
                 tri.v[2]=vetorVertice.at(i).at(j-1);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
+                ///1
                 tri.v[0]=vetorVertice.at(i).at(j);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[1].z=0;
                 tri.v[2]=vetorVertice.at(i).at(j);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
+                ///2
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///3
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///4
+                /*tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///5
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///6
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///7
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///8
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///9
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///10
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///11
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///12*/
             }
         }
     }
@@ -151,7 +238,6 @@ void desenhaEixos() //Desenha os eixos
         glEnd();
     glEnable(GL_LIGHTING);
 }
-
 
 void desenhaPonto2D(vertice v) //Função auxiliar de desenho
 {
@@ -343,6 +429,12 @@ void mouse(int button, int state, int x, int y)
             {
                 vetorVertice.resize(grupo);
             }
+
+            CalculaOrtogonal(v,outro vertice,&vetorOrtogonal);
+            v.x0 = v.x + vetorOrtogonal.x*espessura;
+            v.y0 = v.y + vetorOrtogonal.y*espessura;
+            v.x1 = v.x - vetorOrtogonal.x*espessura;
+            v.y1 = v.y - vetorOrtogonal.y*espessura;
             vetorVertice.at(grupo-1).push_back(v);
         }
         last_x = x;
