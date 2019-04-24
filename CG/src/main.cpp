@@ -50,35 +50,43 @@ void salvarModelo(std::string outFileName)
     //std::ofstream outFile(outFileName, std::ifstream::out);
 
     std::ofstream outFile;
-    outFile.open(outFileName, std::ifstream::out);
+    outFile.open("../Modelos/" + outFileName, std::ifstream::out);
 
-    int quantidadeGrupos=0;
-
-    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    if (!outFile.is_open())
     {
-        if(!vetorVertice.at(i).empty())
-        {
-            quantidadeGrupos++;
-        }
+      std::cout << "Falha na criação do arquivo" << std::endl;
     }
-
-    outFile << quantidadeGrupos << std::endl;
-
-    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    else
     {
-        if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        int quantidadeGrupos=0;
+
+        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
         {
-            for(int j=0; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+            if(!vetorVertice.at(i).empty())
             {
-                outFile << vetorVertice.at(i).at(j).x << ";" << vetorVertice.at(i).at(j).y << ";" << vetorVertice.at(i).at(j).z << ";";
-                outFile << vetorVertice.at(i).at(j).x0 << ";" << vetorVertice.at(i).at(j).x1 << ";" << vetorVertice.at(i).at(j).y0 << ";" << vetorVertice.at(i).at(j).y1 << ";";
-                outFile << std::endl;
-
+                quantidadeGrupos++;
             }
-            outFile << std::endl;
         }
+
+        outFile << quantidadeGrupos << std::endl;
+
+        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+        {
+            if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+            {
+                for(int j=0; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+                {
+                    outFile << vetorVertice.at(i).at(j).x << ";" << vetorVertice.at(i).at(j).y << ";" << vetorVertice.at(i).at(j).z << ";";
+                    outFile << vetorVertice.at(i).at(j).x0 << ";" << vetorVertice.at(i).at(j).x1 << ";" << vetorVertice.at(i).at(j).y0 << ";" << vetorVertice.at(i).at(j).y1 << ";";
+                    outFile << std::endl;
+
+                }
+                outFile << std::endl;
+            }
+        }
+        outFile.close();
+        std::cout << "Arquivo salvo com sucesso na pasta Modelos!" << std::endl;
     }
-    outFile.close();
 }
 
 std::vector<std::string> explode(std::string const & string, char delimiter)
@@ -96,7 +104,7 @@ void carregarModelo(std::string inFileName)
 {
     //std::ofstream outFile(outFileName, std::ifstream::out);
 
-    std::ifstream inFile(inFileName);
+    std::ifstream inFile("../Modelos/" + inFileName);
 
     if (!inFile.is_open())
     {
@@ -132,8 +140,9 @@ void carregarModelo(std::string inFileName)
                 grupoAtual++;
             }
         }
+        inFile.close();
+        std::cout << "Modelo carregado com sucesso!" << std::endl;
     }
-    inFile.close();
 }
 
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
@@ -432,7 +441,10 @@ void desenhaPontos() //Desenha os pontos
             for(int j=0; j<vetorVertice.at(i).size(); j++)
             {
                 desenhaPonto2D(vetorVertice.at(i).at(j)); //Desenha o ponto em 2D
-                desenhaPontosOrtogonais(vetorVertice.at(i).at(j)); //Desenha os pontos ortogonais
+                if(vetorVertice.at(i).size()!=1)
+                {
+                    desenhaPontosOrtogonais(vetorVertice.at(i).at(j)); //Desenha os pontos ortogonais
+                }
             }
         }
     }
