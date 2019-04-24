@@ -39,8 +39,8 @@ void setMaterials(void)
     glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
 
     // Material das faces internas (amarelo)
-    GLfloat objeto_ambient_back[]   = { 0.1745, 0.174, 0.011, 1.0 };
-    GLfloat objeto_difusa_back[]    = { 0.6144, 0.614, 0.041, 1.0 };
+    GLfloat objeto_ambient_back[]   = { 0.1745, 0.01175, 0.011, 1.0 };
+    GLfloat objeto_difusa_back[]    = { 0.6142, 0.04136, 0.041, 1.0 };
 
     glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient_back);
     glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa_back);

@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1556050535 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1556131711 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -27,6 +27,10 @@
 	<math.h>
 	<stack>
 	<vector>
+	<iostream>
+	<fstream>
+	<string>
+	<sstream>
 	"extras.h"
 
 1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
@@ -66,7 +70,7 @@
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
-1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
+1556130267 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
 
 1555699742 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 
