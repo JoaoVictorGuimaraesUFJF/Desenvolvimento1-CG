@@ -35,6 +35,7 @@ int   width, height;
 int altura = 1, grupo = 1, espessura = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
+std::string nomeArquivo;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
 /// Functions
@@ -536,13 +537,14 @@ void keyboard (unsigned char key, int x, int y)
         break;
     case 'l':
         //carregar
-        carregarModelo("testeteste.txt");
+        printf("Digite o nome do modelo a ser carregado: \n");
+        std::cin >> nomeArquivo;
+        carregarModelo(nomeArquivo);
         break;
     case 's':
         //salvar
-        std::string nomeArquivo="testeteste.txt";
         printf("Digite o nome do modelo a ser salvo: \n");
-        //scanf("%s", nomeArquivo);
+        std::cin >> nomeArquivo;
         salvarModelo(nomeArquivo);
         break;
     }
@@ -598,7 +600,7 @@ void mouse(int button, int state, int x, int y)
             vertice v;
             v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
             v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
-            v.z = (float) altura;
+            v.z = (float) altura/5;
             if(vetorVertice.size() < grupo)
             {
                 vetorVertice.resize(grupo);
@@ -612,18 +614,10 @@ void mouse(int button, int state, int x, int y)
                 v.y1 = v.y + vetorOrtogonal.y*espessura/10;
                 if(vetorVertice.at(grupo-1).size()==1)
                 {
-                    std::cout << v.x0 << std::endl;
-                    std::cout << v.x1 << std::endl;
-                    std::cout << v.y0 << std::endl;
-                    std::cout << v.y1 << std::endl;
-                    vetorVertice.at(grupo-1).front().x0=v.x0;
-                    vetorVertice.at(grupo-1).front().y0=v.y0;
-                    vetorVertice.at(grupo-1).front().x1=v.x1;
-                    vetorVertice.at(grupo-1).front().y1=v.y1;
-                    std::cout << vetorVertice.at(grupo-1).front().x0 << std::endl;
-                    std::cout << vetorVertice.at(grupo-1).front().x1 << std::endl;
-                    std::cout << vetorVertice.at(grupo-1).front().y0 << std::endl;
-                    std::cout << vetorVertice.at(grupo-1).front().y1 << std::endl;
+                    vetorVertice.at(grupo-1).front().x0=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*(-espessura)/10;
+                    vetorVertice.at(grupo-1).front().y0=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*(-espessura)/10;
+                    vetorVertice.at(grupo-1).front().x1=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*espessura/10;
+                    vetorVertice.at(grupo-1).front().y1=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*espessura/10;
                 }
             }
             vetorVertice.at(grupo-1).push_back(v);
