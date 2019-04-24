@@ -49,18 +49,24 @@
 1555444742 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
 	"glcFPSViewer.h"
 
-1555444742 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
+1556091450 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
+	<string.h>
 	<ctype.h>
 	<math.h>
 	<stack>
 	<vector>
-	"glcFPSViewer.h"
-	"extras1.h"
+	<iostream>
+	<fstream>
+	<string>
+	<sstream>
+	"extras.h"
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
 1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
+
+1555699742 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 

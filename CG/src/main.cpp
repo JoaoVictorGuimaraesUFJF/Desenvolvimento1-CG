@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stack>
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 #include "extras.h"
 
@@ -14,7 +18,7 @@
 class vertice
 {
 public:
-    float x,y,z,x0,x1,y0,y1;
+    float x,y,z,x0=0,x1=0,y0=0,y1=0;
     int espessura;
 };
 
@@ -39,6 +43,98 @@ void init(void)
 {
     initLight(width, height); // Função extra para tratar iluminação.
     setMaterials();
+}
+
+void salvarModelo(std::string outFileName)
+{
+    //std::ofstream outFile(outFileName, std::ifstream::out);
+
+    std::ofstream outFile;
+    outFile.open(outFileName, std::ifstream::out);
+
+    int quantidadeGrupos=0;
+
+    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    {
+        if(!vetorVertice.at(i).empty())
+        {
+            quantidadeGrupos++;
+        }
+    }
+
+    outFile << quantidadeGrupos << std::endl;
+
+    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    {
+        if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        {
+            for(int j=0; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+            {
+                outFile << vetorVertice.at(i).at(j).x << ";" << vetorVertice.at(i).at(j).y << ";" << vetorVertice.at(i).at(j).z << ";";
+                outFile << vetorVertice.at(i).at(j).x0 << ";" << vetorVertice.at(i).at(j).x1 << ";" << vetorVertice.at(i).at(j).y0 << ";" << vetorVertice.at(i).at(j).y1 << ";";
+                outFile << vetorVertice.at(i).at(j).espessura << std::endl;
+
+            }
+            outFile << std::endl;
+        }
+    }
+    outFile.close();
+}
+
+std::vector<std::string> explode(std::string const & string, char delimiter)
+  {
+    std::vector<std::string> result;
+    std::istringstream iss(string);
+
+    for (std::string token; std::getline(iss, token, delimiter); )
+      result.push_back(std::move(token));
+
+    return result;
+  }
+
+void carregarModelo(std::string inFileName)
+{
+    //std::ofstream outFile(outFileName, std::ifstream::out);
+
+    std::ifstream inFile(inFileName);
+
+    if (!inFile.is_open())
+    {
+      std::cout << "Falha na leitura do arquivo" << std::endl;
+    }
+    else
+    {
+        vetorVertice.clear();
+        std::string line;
+        std::vector<std::string> data;
+        int quantidadeGrupos=0, grupoAtual=0;
+        std::getline(inFile, line);
+        quantidadeGrupos = std::stoi(line);
+        grupo=quantidadeGrupos+1;
+        vetorVertice.resize(quantidadeGrupos);
+        while (std::getline(inFile, line) && grupoAtual<quantidadeGrupos)
+        {
+            if(!line.empty())
+            {
+                data = explode(line, ';');
+                vertice v;
+                v.x = std::stof (data[0]);
+                v.y = std::stof (data[1]);
+                v.z = std::stof (data[2]);
+                v.x0 = std::stof (data[3]);
+                v.x1 = std::stof (data[4]);
+                v.y0 = std::stof (data[5]);
+                v.y1 = std::stof (data[6]);
+                v.espessura = std::stof (data[7]);
+                vetorVertice.at(grupoAtual).push_back(v);
+            }
+            else
+            {
+                grupoAtual++;
+            }
+        }
+    }
+    inFile.close();
 }
 
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
@@ -129,31 +225,95 @@ void drawObject()
             {
                 triangle tri;
                 tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
                 tri.v[2]=vetorVertice.at(i).at(j-1);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
                 ///1
                 tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
                 tri.v[2]=vetorVertice.at(i).at(j);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
                 ///2
                 tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
+                tri.v[2]=vetorVertice.at(i).at(j-1);
                 tri.v[2]=vetorVertice.at(i).at(j-1);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
                 ///3
                 tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[0]=vetorVertice.at(i).at(j);
+                tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[1].z=0;
+                tri.v[2]=vetorVertice.at(i).at(j);
                 tri.v[2]=vetorVertice.at(i).at(j);
                 tri.v[2].z=0;
                 triangulos.push_back(tri);
                 ///4
+
+                /*tri.v[0].x=vetorVertice.at(i).at(j).x0;
+                tri.v[0].y=vetorVertice.at(i).at(j).y0;
+                tri.v[0].z=vetorVertice.at(i).at(j).z;
+                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
+                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
+                tri.v[2].x=vetorVertice.at(i).at(j-1).x0;
+                tri.v[2].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///1
+                tri.v[0].x=vetorVertice.at(i).at(j).x0;
+                tri.v[0].y=vetorVertice.at(i).at(j).y0;
+                tri.v[0].z=vetorVertice.at(i).at(j).z;
+                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
+                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[1].z=0;
+                tri.v[2].x=vetorVertice.at(i).at(j).x0;
+                tri.v[2].y=vetorVertice.at(i).at(j).y0;
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///2
+                tri.v[0].x=vetorVertice.at(i).at(j).x1;
+                tri.v[0].y=vetorVertice.at(i).at(j).y1;
+                tri.v[0].z=vetorVertice.at(i).at(j).z;
+                tri.v[1].x=vetorVertice.at(i).at(j-1).x1;
+                tri.v[1].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
+                tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
+                tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///3
+                tri.v[0].x=vetorVertice.at(i).at(j).x1;
+                tri.v[0].y=vetorVertice.at(i).at(j).y1;
+                tri.v[0].z=vetorVertice.at(i).at(j).z;
+                tri.v[1].x=vetorVertice.at(i).at(j-1).x1;
+                tri.v[1].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[1].z=0;
+                tri.v[2].x=vetorVertice.at(i).at(j).x1;
+                tri.v[2].y=vetorVertice.at(i).at(j).y1;
+                tri.v[2].z=0;
+                triangulos.push_back(tri);
+                ///4*/
+
                 /*tri.v[0]=vetorVertice.at(i).at(j);
                 tri.v[1]=vetorVertice.at(i).at(j-1);
                 tri.v[2]=vetorVertice.at(i).at(j-1);
@@ -366,9 +526,14 @@ void keyboard (unsigned char key, int x, int y)
         break;
     case 'l':
         //carregar
+        carregarModelo("testeteste.txt");
         break;
     case 's':
         //salvar
+        std::string nomeArquivo="testeteste.txt";
+        printf("Digite o nome do modelo a ser salvo: \n");
+        //scanf("%s", nomeArquivo);
+        salvarModelo(nomeArquivo);
         break;
     }
 }
@@ -430,11 +595,21 @@ void mouse(int button, int state, int x, int y)
                 vetorVertice.resize(grupo);
             }
 
-            CalculaOrtogonal(v,outro vertice,&vetorOrtogonal);
-            v.x0 = v.x + vetorOrtogonal.x*espessura;
-            v.y0 = v.y + vetorOrtogonal.y*espessura;
-            v.x1 = v.x - vetorOrtogonal.x*espessura;
-            v.y1 = v.y - vetorOrtogonal.y*espessura;
+            if(!vetorVertice.at(grupo-1).empty()){
+                CalculaOrtogonal(v, vetorVertice.at(grupo-1).back(), &vetorOrtogonal);
+                v.x0 = v.x - vetorOrtogonal.x*espessura;
+                v.y0 = v.y - vetorOrtogonal.y*espessura;
+                v.x1 = v.x + vetorOrtogonal.x*espessura;
+                v.y1 = v.y + vetorOrtogonal.y*espessura;
+                if(vetorVertice.at(grupo-1).size()==1)
+                {
+                    vetorVertice.at(grupo-1).at(0).x0=v.x0;
+                    vetorVertice.at(grupo-1).at(0).y0=v.y0;
+                    vetorVertice.at(grupo-1).at(0).x1=v.x1;
+                    vetorVertice.at(grupo-1).at(0).y1=v.y1;
+                }
+            }
+
             vetorVertice.at(grupo-1).push_back(v);
         }
         last_x = x;
