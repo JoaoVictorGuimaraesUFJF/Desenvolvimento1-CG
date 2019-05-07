@@ -1,5 +1,0 @@
-# depslib dependency file v1.0
-1552594444 source:/ice/CG/CG/src/quad.cpp
-	<stdio.h>
-	<GL/glut.h>
-

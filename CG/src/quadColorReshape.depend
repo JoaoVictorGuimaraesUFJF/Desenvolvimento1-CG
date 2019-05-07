@@ -1,5 +1,0 @@
-# depslib dependency file v1.0
-1554572902 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/quadColorReshape.cpp
-	<stdio.h>
-	<GL/glut.h>
-
