@@ -36,7 +36,8 @@ int altura = 1, grupo = 1, espessura = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
 std::string nomeArquivo;
-std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
+std::vector<vertice> vetorVertice; //Estrutura utilizada para armazenar os vértices
+std::vector< std::vector<triangle> > vetorObjetos;
 
 /// Functions
 void init(void)
@@ -145,11 +146,9 @@ void carregarModelo(std::string inFileName)
     }
 }
 
-void carregaPLY(std::string inFileName)
+void carregaPLY(std::string inFileName, int numObjeto)
 {
-    //std::ofstream outFile(outFileName, std::ifstream::out);
-
-    std::ifstream inFile("../plyObjects/ply/" + inFileName);
+    std::ifstream inFile("../plyObjects/" + inFileName);
 
     if (!inFile.is_open())
     {
@@ -160,59 +159,65 @@ void carregaPLY(std::string inFileName)
         vetorVertice.clear();
         std::string line;
         std::vector<std::string> data;
-        std::vector<triangle> triangulos
 
-        std::getline(inFile, line);
-        std::getline(inFile, line);
-
-        vetorVertice.resize(1);
-        while (std::getline(inFile, line))
+        while (std::getline(inFile, line) && line!="end_header") //Lê cabeçalho
         {
             if(!line.empty())
             {
                 data = explode(line, ' ');
-                if (equal_strings (data[0], "comment"))
+                if (equal_strings (data[0], "element"))
                 {
-                    //IGNORA
-                }
-                else if (equal_strings (data[0], "element"))
-                {///-------------------------------------AQUI---------
                     if (equal_strings (data[1], "vertex"))
+                    {
+                        vetorVertice.resize(std::stoi(data[2]));
+                    }
+                    else if (equal_strings (data[1], "face"))
+                    {
+                        vetorObjetos.at(numObjeto).resize(std::stoi(data[2]));
+                    }
                 }
-                else if (equal_strings (words[0], "property"))
-                    add_property (plyfile, words, nwords);
-                else if (equal_strings (words[0], "comment"))
-                    add_comment (plyfile, orig_line);
-                else if (equal_strings (words[0], "obj_info"))
-                    add_obj_info (plyfile, orig_line);
-                else if (equal_strings (words[0], "end_header"))
-                    break;
             }
-
-
-
-            if(data.size() == 3)
-            {
-                vertice v;
-                v.x = std::stof (data[0]);
-                v.y = std::stof (data[1]);
-                v.z = std::stof (data[2]);
-                vetorVertice.at(0).push_back(v);
-            }
-            if(data.size() == 4)
-            {
-                triangle tri;
-                tri.v[0] = vetorVertice.at(0).at(std::stoi(data[1]));
-                tri.v[1] = vetorVertice.at(0).at(std::stoi(data[2]));
-                tri.v[2] = vetorVertice.at(0).at(std::stoi(data[3]));
-                triangulos.push_back(tri);
-            }
-
         }
-        inFile.close();
-        std::cout << "Modelo carregado com sucesso!" << std::endl;
+
+        for(int i = 0; i < vetorVertice.size(); i++){
+            std::getline(inFile, line);
+            data = explode(line, ' ');
+            vertice v;
+            v.x = std::stof (data[0]);
+            v.y = std::stof (data[1]);
+            v.z = std::stof (data[2]);
+            vetorVertice.push_back(v);
+        }
+
+        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++){
+            std::getline(inFile, line);
+            data = explode(line, ' ');
+            triangle tri;
+            if(data[0] == 3){
+                tri.x = vetorVertice.at(std::stoi(data[1]));
+                tri.y = vetorVertice.at(std::stoi(data[2]));
+                tri.z = vetorVertice.at(std::stoi(data[3]));
+                vetorObjetos.at(numObjeto).push_back(tri);
+            }
+            else if (data[0] == 4){
+                tri.x = vetorVertice.at(std::stoi(data[1]));
+                tri.y = vetorVertice.at(std::stoi(data[2]));
+                tri.z = vetorVertice.at(std::stoi(data[3]));
+                vetorObjetos.at(numObjeto).push_back(tri);
+
+                tri.x = vetorVertice.at(std::stoi(data[2]));
+                tri.y = vetorVertice.at(std::stoi(data[3]));
+                tri.z = vetorVertice.at(std::stoi(data[4]));
+                vetorObjetos.at(numObjeto).push_back(tri);
+
+            }
+        }
+
     }
+    inFile.close();
+    std::cout << "Modelo carregado com sucesso!" << std::endl;
 }
+
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
   v_2
   ^
@@ -727,22 +732,22 @@ void mouse(int button, int state, int x, int y)
 }
 
 /// Main
-//int main(int argc, char** argv)
-//{
-//    glutInit(&argc, argv);
-//    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-//    glutInitWindowSize (800, 400);
-//    glutInitWindowPosition (100, 100);
-//    glutCreateWindow (argv[0]);
-//    showMenu();
-//    init ();
-//    glutDisplayFunc(display);
-//    glutReshapeFunc(reshape);
-//    glutMouseFunc( mouse );
-//    glutMotionFunc( motion );
-//    glutKeyboardFunc(keyboard);
-//    glutSpecialFunc( specialKeys );
-//    glutIdleFunc(idle);
-//    glutMainLoop();
-//    return 0;
-//}
+int main(int argc, char** argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize (800, 400);
+    glutInitWindowPosition (100, 100);
+    glutCreateWindow (argv[0]);
+    showMenu();
+    init ();
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutMouseFunc( mouse );
+    glutMotionFunc( motion );
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc( specialKeys );
+    glutIdleFunc(idle);
+    glutMainLoop();
+    return 0;
+}

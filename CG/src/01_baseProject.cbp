@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="T1 2019.1" />
+		<Option title="D2 2019.1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Sources/;" />
@@ -34,7 +34,7 @@
 			<Add library="GLEW" />
 		</Linker>
 		<Unit filename="extras.h" />
-		<Unit filename="main.cpp" />
+		<Unit filename="main-D2.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />
