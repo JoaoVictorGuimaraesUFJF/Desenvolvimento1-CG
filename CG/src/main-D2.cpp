@@ -32,10 +32,8 @@ float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
-int altura = 1, grupo = 1, espessura = 1; //Variaveis
-vertice vetorOrtogonal;
+
 bool fullScreen = false;
-std::string nomeArquivo;
 int objetoAtual = 0;
 std::vector<vertice> vetorVertice; //Estrutura utilizada para armazenar os vértices
 std::vector< std::vector<triangle> > vetorObjetos;
@@ -47,49 +45,6 @@ void init(void)
     setMaterials();
 }
 
-void salvarModelo(std::string outFileName)
-{
-    //std::ofstream outFile(outFileName, std::ifstream::out);
-
-    std::ofstream outFile;
-    outFile.open("../Modelos/" + outFileName, std::ifstream::out);
-
-    if (!outFile.is_open())
-    {
-        std::cout << "Falha na criação do arquivo" << std::endl;
-    }
-    else
-    {
-        int quantidadeGrupos=0;
-
-        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
-        {
-            if(!vetorVertice.at(i).empty())
-            {
-                quantidadeGrupos++;
-            }
-        }
-
-        outFile << quantidadeGrupos << std::endl;
-
-        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
-        {
-            if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
-            {
-                for(int j=0; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
-                {
-                    outFile << vetorVertice.at(i).at(j).x << ";" << vetorVertice.at(i).at(j).y << ";" << vetorVertice.at(i).at(j).z << ";";
-                    outFile << vetorVertice.at(i).at(j).x0 << ";" << vetorVertice.at(i).at(j).x1 << ";" << vetorVertice.at(i).at(j).y0 << ";" << vetorVertice.at(i).at(j).y1 << ";";
-                    outFile << std::endl;
-
-                }
-                outFile << std::endl;
-            }
-        }
-        outFile.close();
-        std::cout << "Arquivo salvo com sucesso na pasta Modelos!" << std::endl;
-    }
-}
 
 std::vector<std::string> explode(std::string const & string, char delimiter)
 {
@@ -100,51 +55,6 @@ std::vector<std::string> explode(std::string const & string, char delimiter)
         result.push_back(std::move(token));
 
     return result;
-}
-
-void carregarModelo(std::string inFileName)
-{
-    //std::ofstream outFile(outFileName, std::ifstream::out);
-
-    std::ifstream inFile("../Modelos/" + inFileName);
-
-    if (!inFile.is_open())
-    {
-        std::cout << "Falha na leitura do arquivo" << std::endl;
-    }
-    else
-    {
-        vetorVertice.clear();
-        std::string line;
-        std::vector<std::string> data;
-        int quantidadeGrupos=0, grupoAtual=0;
-        std::getline(inFile, line);
-        quantidadeGrupos = std::stoi(line);
-        grupo=quantidadeGrupos+1;
-        vetorVertice.resize(quantidadeGrupos);
-        while (std::getline(inFile, line) && grupoAtual<quantidadeGrupos)
-        {
-            if(!line.empty())
-            {
-                data = explode(line, ';');
-                vertice v;
-                v.x = std::stof (data[0]);
-                v.y = std::stof (data[1]);
-                v.z = std::stof (data[2]);
-                v.x0 = std::stof (data[3]);
-                v.x1 = std::stof (data[4]);
-                v.y0 = std::stof (data[5]);
-                v.y1 = std::stof (data[6]);
-                vetorVertice.at(grupoAtual).push_back(v);
-            }
-            else
-            {
-                grupoAtual++;
-            }
-        }
-        inFile.close();
-        std::cout << "Modelo carregado com sucesso!" << std::endl;
-    }
 }
 
 void carregaPLY(std::string inFileName, int numObjeto)
@@ -166,13 +76,13 @@ void carregaPLY(std::string inFileName, int numObjeto)
             if(!line.empty())
             {
                 data = explode(line, ' ');
-                if (equal_strings (data[0], "element"))
+                if (data[0] == "element")
                 {
-                    if (equal_strings (data[1], "vertex"))
+                    if (data[1] == "vertex")
                     {
                         vetorVertice.resize(std::stoi(data[2]));
                     }
-                    else if (equal_strings (data[1], "face"))
+                    else if (data[1] == "face")
                     {
                         vetorObjetos.at(numObjeto).resize(std::stoi(data[2]));
                     }
@@ -194,21 +104,21 @@ void carregaPLY(std::string inFileName, int numObjeto)
             std::getline(inFile, line);
             data = explode(line, ' ');
             triangle tri;
-            if(data[0] == 3){
-                tri.x = vetorVertice.at(std::stoi(data[1]));
-                tri.y = vetorVertice.at(std::stoi(data[2]));
-                tri.z = vetorVertice.at(std::stoi(data[3]));
+            if(data[0] == "3"){
+                tri.v.x = vetorVertice.at(std::stoi(data[1]));
+                tri.v.y = vetorVertice.at(std::stoi(data[2]));
+                tri.v.z = vetorVertice.at(std::stoi(data[3]));
                 vetorObjetos.at(numObjeto).push_back(tri);
             }
-            else if (data[0] == 4){
-                tri.x = vetorVertice.at(std::stoi(data[1]));
-                tri.y = vetorVertice.at(std::stoi(data[2]));
-                tri.z = vetorVertice.at(std::stoi(data[3]));
+            else if (data[0] == "4"){
+                tri.v.x = vetorVertice.at(std::stoi(data[1]));
+                tri.v.y = vetorVertice.at(std::stoi(data[2]));
+                tri.v.z = vetorVertice.at(std::stoi(data[3]));
                 vetorObjetos.at(numObjeto).push_back(tri);
 
-                tri.x = vetorVertice.at(std::stoi(data[2]));
-                tri.y = vetorVertice.at(std::stoi(data[3]));
-                tri.z = vetorVertice.at(std::stoi(data[4]));
+                tri.v.x = vetorVertice.at(std::stoi(data[2]));
+                tri.v.y = vetorVertice.at(std::stoi(data[3]));
+                tri.v.z = vetorVertice.at(std::stoi(data[4]));
                 vetorObjetos.at(numObjeto).push_back(tri);
 
             }
@@ -260,25 +170,6 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->z /= len;
 }
 
-void CalculaOrtogonal(vertice v0, vertice v1, vertice *vo)
-{
-    vertice temp;
-
-    /* Encontra vetor v */
-    temp.x = v1.x - v0.x;
-    temp.y = v1.y - v0.y;
-
-    /* Calculo do produto vetorial de v1 e v2 */
-    vo->x = -temp.y;
-    vo->y = temp.x;
-
-    // Normaliza vetor
-    float tam = sqrt( pow( (v0.x-v1.x)/2 - vo->x,2) + pow( (v0.y-v1.y)/2 - vo->y,2) );
-    vo->x /= tam;
-    vo->y /= tam;
-
-}
-
 void showMenu()
 {
     printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
@@ -311,87 +202,11 @@ void drawObject(int numObjeto)
 
 }
 
-void desenhaEixos() //Desenha os eixos
-{
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glColor3f(1.0,0.0,0.0);
-    glVertex3f(-100.0,0.0,0.0);
-    glVertex3f(100.0,0.0,0.0);
-    glEnd();
-
-    glBegin(GL_LINES);
-    glColor3f(0.0,1.0,0.0);
-    glVertex3f(0.0,-100.0,0.0);
-    glVertex3f(0.0,100.0,0.0);
-    glEnd();
-    glEnable(GL_LIGHTING);
-}
-
-void desenhaPonto2D(vertice v) //Função auxiliar de desenho
-{
-    glDisable(GL_LIGHTING);
-    float x=v.x;
-    float y=v.y;
-    glPointSize(10.0); //Define o tamanho do ponto
-    glColor3f(1.0f, 0.0f, 0.0f); //Define cor do ponto
-    glBegin(GL_POINTS);
-    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-    glEnd();
-    glEnable(GL_LIGHTING);
-
-}
-
-void desenhaPontosOrtogonais(vertice v) //Função auxiliar de desenho
-{
-    glDisable(GL_LIGHTING);
-    glPointSize(10.0); //Define o tamanho do ponto
-    glColor3f(0.0f, 1.0f, 1.0f); //Define cor do ponto
-    float x=v.x0;
-    float y=v.y0;
-    glBegin(GL_POINTS);
-    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-    glEnd();
-    x=v.x1;
-    y=v.y1;
-    glBegin(GL_POINTS);
-    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-    glEnd();
-    glEnable(GL_LIGHTING);
-
-}
-
-void desenhaPontos() //Desenha os pontos
-{
-    for(int i=0; i<vetorVertice.size(); i++)
-    {
-        if(!vetorVertice.at(i).empty())
-        {
-            for(int j=0; j<vetorVertice.at(i).size(); j++)
-            {
-                desenhaPonto2D(vetorVertice.at(i).at(j)); //Desenha o ponto em 2D
-                if(vetorVertice.at(i).size()!=1)
-                {
-                    desenhaPontosOrtogonais(vetorVertice.at(i).at(j)); //Desenha os pontos ortogonais
-                }
-            }
-        }
-    }
-}
-
-void excluirPonto(int grupo) //Apaga os pontos
-{
-    if(!vetorVertice.at(grupo-1).empty())
-    {
-        vetorVertice.at(grupo-1).pop_back(); // Remove o ultimo elemento do vetor
-    }
-}
-
-void imprimeTitulo(int grupo, int altura, int espessura)
+void imprimeTitulo()
 {
     char aux[32];
     static char fpsBuf[256] = {0};
-    sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i ", grupo, altura,espessura);
+    sprintf(aux, "Grupo: , Altura: , Espessura:  ");
     strcpy(fpsBuf, "Desenvolvimento 1 - ");
     strcat(fpsBuf, aux);
     strcat(fpsBuf, "- Press ESC to exit.");
@@ -445,27 +260,6 @@ void keyboard (unsigned char key, int x, int y)
     case 27:
         exit(0);
         break;
-    case '.':
-        espessura += 1;
-        break;
-    case ',':
-        if(espessura <= 1)
-            espessura = 1;
-        else
-            espessura -= 1;
-        break;
-    case 'l':
-        //carregar
-        printf("Digite o nome do modelo a ser carregado: \n");
-        std::cin >> nomeArquivo;
-        carregarModelo(nomeArquivo);
-        break;
-    case 's':
-        //salvar
-        printf("Digite o nome do modelo a ser salvo: \n");
-        std::cin >> nomeArquivo;
-        salvarModelo(nomeArquivo);
-        break;
     }
 }
 
@@ -475,22 +269,16 @@ void specialKeys(int key, int x, int y)
     switch(key)
     {
     case GLUT_KEY_LEFT:
-        if(grupo <= 1)
-            grupo = 1;
+        if(objetoAtual <= 0)
+            objetoAtual = 5;
         else
-            grupo -= 1;
+            objetoAtual -= 1;
         break;
     case GLUT_KEY_RIGHT:
-        grupo += 1;
-        break;
-    case GLUT_KEY_UP:
-        altura += 1;
-        break;
-    case GLUT_KEY_DOWN:
-        if(altura <= 1)
-            altura = 1;
+        if(objetoAtual >= 5)
+            objetoAtual = 0;
         else
-            altura -= 1;
+            objetoAtual += 1;
         break;
     case GLUT_KEY_F12:
         (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
@@ -515,44 +303,8 @@ void mouse(int button, int state, int x, int y)
 {
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
     {
-        if(x<=width/2)
-        {
-            vertice v;
-            v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
-            v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
-            v.z = (float) altura/5;
-            if(vetorVertice.size() < grupo)
-            {
-                vetorVertice.resize(grupo);
-            }
-
-            if(!vetorVertice.at(grupo-1).empty())
-            {
-                CalculaOrtogonal(v, vetorVertice.at(grupo-1).back(), &vetorOrtogonal);
-                v.x0 = v.x + vetorOrtogonal.x*(-espessura)/10;
-                v.y0 = v.y + vetorOrtogonal.y*(-espessura)/10;
-                v.x1 = v.x + vetorOrtogonal.x*espessura/10;
-                v.y1 = v.y + vetorOrtogonal.y*espessura/10;
-                if(vetorVertice.at(grupo-1).size()==1)
-                {
-                    vetorVertice.at(grupo-1).front().x0=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*(-espessura)/10;
-                    vetorVertice.at(grupo-1).front().y0=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*(-espessura)/10;
-                    vetorVertice.at(grupo-1).front().x1=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*espessura/10;
-                    vetorVertice.at(grupo-1).front().y1=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*espessura/10;
-                }
-            }
-            vetorVertice.at(grupo-1).push_back(v);
-        }
         last_x = x;
         last_y = y;
-    }
-    if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
-    {
-        if(vetorVertice.size() < grupo)
-        {
-            vetorVertice.resize(grupo);
-        }
-        excluirPonto(grupo);
     }
     if(button == 3) // Scroll up
     {
