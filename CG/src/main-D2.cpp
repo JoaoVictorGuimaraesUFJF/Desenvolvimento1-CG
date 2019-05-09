@@ -401,33 +401,13 @@ void imprimeTitulo(int grupo, int altura, int espessura)
 void display(void)
 {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
-///--------------Primeira Viewport----------------------------------------------------
-    glViewport (0, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
-    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
-    glScissor(0, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
-    glClearColor(1.0,1.0,1.0,0.0); //Define cor de fundo da viewport
-    glMatrixMode (GL_PROJECTION); //Matriz de projeção
-    glLoadIdentity (); //Matriz identidade
-    glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f); //Define uma região de visualização ortogonal
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
-    glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
-    glLoadIdentity(); //Matriz identidade
 
-    desenhaEixos(); //Desenha os eixos em 2D
-    glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
-    desenhaPontos(); //Desenha os pontos no 2D
-
-
-///--------------Segunda Viewport-----------------------------------------------------
-
-    glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
-    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
-    glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
+    glViewport (0, 0, (GLsizei) width, (GLsizei) height); //Define a visualização na janela da aplicação
     glClearColor(0.0,0.0,0.0,0.0); //Define cor de fundo da viewport
 
     glMatrixMode (GL_PROJECTION); //Matriz de projeção
     glLoadIdentity (); //Matriz identidade
-    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
+    gluPerspective(60.0, (GLfloat) width/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
 
     glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
     glLoadIdentity(); //Matriz identidade
@@ -436,14 +416,12 @@ void display(void)
 
 
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
-    glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-    glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
-    drawObject(); //Desenha o objeto em 3D
+        glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+        glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+        drawObject(objetoAtual); //Desenha o objeto em 3D
     glPopMatrix(); //Descarta a matriz no topo da pilha
 
     glutSwapBuffers(); //Troca os buffers
-
-    imprimeTitulo(grupo, altura, espessura);
 }
 
 void idle ()
