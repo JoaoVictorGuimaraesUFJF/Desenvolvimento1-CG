@@ -221,14 +221,14 @@ void drawObjectWireframe(int numObjeto)
 
 }
 
-void imprimeTitulo()
+void imprimeTitulo(int objetoAtual)
 {
     char aux[32];
     static char fpsBuf[256] = {0};
-    sprintf(aux, "Grupo: , Altura: , Espessura:  ");
-    strcpy(fpsBuf, "Desenvolvimento 1 - ");
+    sprintf(aux, "Objeto %d", objetoAtual+1);
+    strcpy(fpsBuf, "Desenvolvimento 2 - ");
     strcat(fpsBuf, aux);
-    strcat(fpsBuf, "- Press ESC to exit.");
+    strcat(fpsBuf, " - Press ESC to exit.");
     glutSetWindowTitle(fpsBuf);
 }
 
@@ -257,6 +257,8 @@ void display(void)
         else
             drawObject(objetoAtual); //Desenha o objeto em 3D
     glPopMatrix(); //Descarta a matriz no topo da pilha
+
+    imprimeTitulo(objetoAtual);
 
     glutSwapBuffers(); //Troca os buffers
 }
