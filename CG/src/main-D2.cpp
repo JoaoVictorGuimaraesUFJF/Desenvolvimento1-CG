@@ -18,7 +18,7 @@
 class vertice
 {
 public:
-    float x,y,z,x0=0,x1=0,y0=0,y1=0;
+    float x,y,z;
 };
 
 class triangle
@@ -34,9 +34,13 @@ int   last_x, last_y;
 int   width, height;
 
 bool fullScreen = false;
+bool wireframe = false;
 int objetoAtual = 0;
-std::vector<vertice> vetorVertice; //Estrutura utilizada para armazenar os vértices
+int tamanhoVetorVertice = 0;
+int tamanhoVetorObjeto = 0;
+std::vector< vertice > vetorVertice; //Estrutura utilizada para armazenar os vértices
 std::vector< std::vector<triangle> > vetorObjetos;
+
 
 /// Functions
 void init(void)
@@ -80,17 +84,19 @@ void carregaPLY(std::string inFileName, int numObjeto)
                 {
                     if (data[1] == "vertex")
                     {
-                        vetorVertice.resize(std::stoi(data[2]));
+                        tamanhoVetorVertice = std::stoi(data[2]);
+
                     }
                     else if (data[1] == "face")
                     {
-                        vetorObjetos.at(numObjeto).resize(std::stoi(data[2]));
+                        tamanhoVetorObjeto = std::stoi(data[2]);
                     }
                 }
             }
         }
 
-        for(int i = 0; i < vetorVertice.size(); i++){
+
+        for(int i = 0; i < tamanhoVetorVertice; i++){
             std::getline(inFile, line);
             data = explode(line, ' ');
             vertice v;
@@ -100,25 +106,25 @@ void carregaPLY(std::string inFileName, int numObjeto)
             vetorVertice.push_back(v);
         }
 
-        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++){
+        for(int i = 0; i < tamanhoVetorObjeto; i++){
             std::getline(inFile, line);
             data = explode(line, ' ');
             triangle tri;
             if(data[0] == "3"){
-                tri.v.x = vetorVertice.at(std::stoi(data[1]));
-                tri.v.y = vetorVertice.at(std::stoi(data[2]));
-                tri.v.z = vetorVertice.at(std::stoi(data[3]));
+                tri.v[0] = vetorVertice.at(std::stoi(data[1]));
+                tri.v[1] = vetorVertice.at(std::stoi(data[2]));
+                tri.v[2] = vetorVertice.at(std::stoi(data[3]));
                 vetorObjetos.at(numObjeto).push_back(tri);
             }
             else if (data[0] == "4"){
-                tri.v.x = vetorVertice.at(std::stoi(data[1]));
-                tri.v.y = vetorVertice.at(std::stoi(data[2]));
-                tri.v.z = vetorVertice.at(std::stoi(data[3]));
+                tri.v[0] = vetorVertice.at(std::stoi(data[1]));
+                tri.v[1] = vetorVertice.at(std::stoi(data[2]));
+                tri.v[2] = vetorVertice.at(std::stoi(data[3]));
                 vetorObjetos.at(numObjeto).push_back(tri);
 
-                tri.v.x = vetorVertice.at(std::stoi(data[2]));
-                tri.v.y = vetorVertice.at(std::stoi(data[3]));
-                tri.v.z = vetorVertice.at(std::stoi(data[4]));
+                tri.v[0] = vetorVertice.at(std::stoi(data[2]));
+                tri.v[1] = vetorVertice.at(std::stoi(data[3]));
+                tri.v[2] = vetorVertice.at(std::stoi(data[4]));
                 vetorObjetos.at(numObjeto).push_back(tri);
 
             }
@@ -172,17 +178,12 @@ void CalculaNormal(triangle t, vertice *vn)
 
 void showMenu()
 {
-    printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
-    printf("Use as setas DIREITA/ESQUERDA para alterar o grupo.\n");
-    printf("Use as setas CIMA/BAIXO para alterar a altura.\n");
-    printf("Use '.' ou ',' para alterar a espessura.\n");
-    printf("Use 's' para salvar o modelo.\n");
-    printf("Use 'l' para carregar um modelo.\n");
+    printf("Desenvolvimento 2 - João Victor Guimarães e Thaynara Ferreira\n");
+    printf("Use as setas DIREITA/ESQUERDA para alterar o objeto.\n");
+    printf("Use 'w' para ativar ou desativar o wireframe.\n");
     printf("Use F12 para colocar em fullscreen.\n");
     printf("Use o scroll do mouse para zoom.\n");
-    printf("Use o botão ESQUERDO do mouse para ADICIONAR pontos no 2D.\n");
-    printf("Use o botão DIREITO do mouse para REMOVER pontos no 2D.\n");
-    printf("Clique e arraste o mouse para rotacionar o modelo gerado em 3D.\n");
+    printf("Clique e arraste o mouse para rotacionar o objeto.\n");
     printf("Use ESC para sair.\n");
 }
 
@@ -197,6 +198,24 @@ void drawObject(int numObjeto)
         glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
         for(int j = 0; j < 3; j++) // vertices do triangulo
             glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+    }
+    glEnd();
+
+}
+
+void drawObjectWireframe(int numObjeto)
+{
+    vertice vetorNormal;
+
+    glBegin(GL_LINE_STRIP);
+    for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+    {
+        CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+        for(int j = 0; j < 3; j++){ // vertices do triangulo
+            glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+        }
+        glVertex3d(vetorObjetos.at(numObjeto).at(i).v[0].x,vetorObjetos.at(numObjeto).at(i).v[0].y, vetorObjetos.at(numObjeto).at(i).v[0].z);
     }
     glEnd();
 
@@ -233,7 +252,10 @@ void display(void)
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
         glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
         glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
-        drawObject(objetoAtual); //Desenha o objeto em 3D
+        if (wireframe)
+            drawObjectWireframe(objetoAtual);
+        else
+            drawObject(objetoAtual); //Desenha o objeto em 3D
     glPopMatrix(); //Descarta a matriz no topo da pilha
 
     glutSwapBuffers(); //Troca os buffers
@@ -259,6 +281,12 @@ void keyboard (unsigned char key, int x, int y)
     {
     case 27:
         exit(0);
+        break;
+    case 'w':
+        if(wireframe)
+            wireframe = false;
+        else
+            wireframe = true;
         break;
     }
 }

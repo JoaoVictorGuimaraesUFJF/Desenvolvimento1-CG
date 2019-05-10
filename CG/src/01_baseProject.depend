@@ -74,3 +74,18 @@
 
 1556133506 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 
+1557503722 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main-D2.cpp
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	<math.h>
+	<stack>
+	<vector>
+	<iostream>
+	<fstream>
+	<string>
+	<sstream>
+	"extras.h"
+
