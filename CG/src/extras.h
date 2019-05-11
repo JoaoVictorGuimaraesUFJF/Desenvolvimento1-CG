@@ -35,6 +35,11 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
     else if(numObjeto==1){//material bunny
         GLfloat objeto_ambient[]   = { 0.10, 0.19, 0.17, 0.8 };
@@ -46,6 +51,11 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
     else if(numObjeto==2){//material cow
         GLfloat objeto_ambient[]   = { 0.23, 0.09, 0.03, 1.0 };
@@ -57,6 +67,11 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
     else if(numObjeto==3){//material dragon
         GLfloat objeto_ambient[]   = { 0.02, 0.17, 0.02, 0.55 };
@@ -68,6 +83,11 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
     else if(numObjeto==4){//material dragon_full
         GLfloat objeto_ambient[]   = { 0.17, 0.01, 0.01, 0.55 };
@@ -79,6 +99,11 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
     else if(numObjeto==5){//material snowman
         GLfloat objeto_ambient[]   = { 0.14, 0.22, 0.16, 0.95 };
@@ -90,5 +115,10 @@ void setMaterials(int numObjeto)
         glMaterialfv(GL_FRONT, GL_DIFFUSE, objeto_difusa);
         glMaterialfv(GL_FRONT, GL_SPECULAR, objeto_especular);
         glMaterialfv(GL_FRONT, GL_SHININESS, objeto_brilho);
+
+        glMaterialfv(GL_BACK, GL_AMBIENT, objeto_ambient);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, objeto_difusa);
+        glMaterialfv(GL_BACK, GL_SPECULAR, objeto_especular);
+        glMaterialfv(GL_BACK, GL_SHININESS, objeto_brilho);
     }
 }
