@@ -421,7 +421,7 @@ world_display(void)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, 'e');
     glColor3ub(255, 0, 0);
     glScalef(0.4, 0.4, 0.4);
-    drawaxes();
+//    drawaxes();
     glPopMatrix();
 
     invert(projection, inverse);

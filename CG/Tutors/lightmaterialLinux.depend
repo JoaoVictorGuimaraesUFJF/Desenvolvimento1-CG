@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1557232835 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/Tutors/glm.c
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"glm.h"
+
+1557232835 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/Tutors/glm.h
+	<GL/glut.h>
+
+1557232835 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/Tutors/lightmaterial.c
+	<GL/glut.h>
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<stdarg.h>
+	<string.h>
+	"glm.h"
+	"materials.h"
+
+1557232835 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/Tutors/materials.h
+

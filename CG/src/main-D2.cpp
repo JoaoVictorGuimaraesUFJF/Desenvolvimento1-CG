@@ -27,6 +27,12 @@ public:
     vertice v[3];
 };
 
+class quadrilateral
+{
+public:
+    vertice v[4];
+};
+
 /// Globals
 float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
@@ -38,15 +44,18 @@ bool wireframe = false;
 int objetoAtual = 0;
 int tamanhoVetorVertice = 0;
 int tamanhoVetorObjeto = 0;
+int qtdTriangulo = 0;
+int qtdQuads = 0;
 std::vector< vertice > vetorVertice; //Estrutura utilizada para armazenar os vértices
-std::vector< std::vector<triangle> > vetorObjetos;
+std::vector< std::vector<triangle> > vetorObjetos; //Estrutura utilizada para armazenar os objetos
+std::vector< quadrilateral > vetorQuads; //Estrutura utilizada para armazenar os quadrilateros
 
 
 /// Functions
 void init(void)
 {
     initLight(width, height); // Função extra para tratar iluminação.
-    setMaterials();
+    setMaterials(objetoAtual);
 }
 
 
@@ -96,7 +105,8 @@ void carregaPLY(std::string inFileName, int numObjeto)
         }
 
 
-        for(int i = 0; i < tamanhoVetorVertice; i++){
+        for(int i = 0; i < tamanhoVetorVertice; i++)
+        {
             std::getline(inFile, line);
             data = explode(line, ' ');
             vertice v;
@@ -106,27 +116,26 @@ void carregaPLY(std::string inFileName, int numObjeto)
             vetorVertice.push_back(v);
         }
 
-        for(int i = 0; i < tamanhoVetorObjeto; i++){
+        for(int i = 0; i < tamanhoVetorObjeto; i++)
+        {
             std::getline(inFile, line);
             data = explode(line, ' ');
             triangle tri;
-            if(data[0] == "3"){
+            quadrilateral quad;
+            if(data[0] == "3")
+            {
                 tri.v[0] = vetorVertice.at(std::stoi(data[1]));
                 tri.v[1] = vetorVertice.at(std::stoi(data[2]));
                 tri.v[2] = vetorVertice.at(std::stoi(data[3]));
                 vetorObjetos.at(numObjeto).push_back(tri);
             }
-            else if (data[0] == "4"){
-                tri.v[0] = vetorVertice.at(std::stoi(data[1]));
-                tri.v[1] = vetorVertice.at(std::stoi(data[2]));
-                tri.v[2] = vetorVertice.at(std::stoi(data[3]));
-                vetorObjetos.at(numObjeto).push_back(tri);
-
-                tri.v[0] = vetorVertice.at(std::stoi(data[2]));
-                tri.v[1] = vetorVertice.at(std::stoi(data[3]));
-                tri.v[2] = vetorVertice.at(std::stoi(data[4]));
-                vetorObjetos.at(numObjeto).push_back(tri);
-
+            else if (data[0] == "4")
+            {
+                quad.v[0] = vetorVertice.at(std::stoi(data[1]));
+                quad.v[1] = vetorVertice.at(std::stoi(data[2]));
+                quad.v[2] = vetorVertice.at(std::stoi(data[3]));
+                quad.v[2] = vetorVertice.at(std::stoi(data[4]));
+                vetorQuads.push_back(quad);
             }
         }
 
@@ -176,6 +185,47 @@ void CalculaNormal(triangle t, vertice *vn)
     vn->z /= len;
 }
 
+/* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do quadrilátero;
+  v_2  v_3
+  ^----|
+  |    |
+  |    |
+  |    |     'vn' é o vetor normal resultante
+  |    |
+  +----> v_1
+  v_0
+*/
+void CalculaNormalQuad(quadrilateral quad, vertice *vn)
+{
+    vertice v_0 = quad.v[0],
+            v_1 = quad.v[1],
+            v_2 = quad.v[2];
+    vertice v1, v2;
+    double len;
+
+    /* Encontra vetor v1 */
+    v1.x = v_1.x - v_0.x;
+    v1.y = v_1.y - v_0.y;
+    v1.z = v_1.z - v_0.z;
+
+    /* Encontra vetor v2 */
+    v2.x = v_2.x - v_0.x;
+    v2.y = v_2.y - v_0.y;
+    v2.z = v_2.z - v_0.z;
+
+    /* Calculo do produto vetorial de v1 e v2 */
+    vn->x = (v1.y * v2.z) - (v1.z * v2.y);
+    vn->y = (v1.z * v2.x) - (v1.x * v2.z);
+    vn->z = (v1.x * v2.y) - (v1.y * v2.x);
+
+    /* normalizacao de n */
+    len = sqrt(pow(vn->x,2) + pow(vn->y,2) + pow(vn->z,2));
+
+    vn->x /= len;
+    vn->y /= len;
+    vn->z /= len;
+}
+
 void showMenu()
 {
     printf("Desenvolvimento 2 - João Victor Guimarães e Thaynara Ferreira\n");
@@ -190,34 +240,91 @@ void showMenu()
 void drawObject(int numObjeto)
 {
     vertice vetorNormal;
-
-    glBegin(GL_TRIANGLES);
-    for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+    if (objetoAtual == 5)
     {
-        CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-        for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
-    }
-    glEnd();
+        qtdTriangulo = 0;
+        glBegin(GL_TRIANGLES);
+        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+        {
+            CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            for(int j = 0; j < 3; j++) // vertices do triangulo
+                glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+            qtdTriangulo += 1;
+        }
+        glEnd();
 
+        qtdQuads = 0;
+        glBegin(GL_QUADS);
+        for(int i = 0; i < vetorQuads.size(); i++) // quadrilateros
+        {
+            CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            for(int j = 0; j < 3; j++) // vertices do quadrilatero
+                glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
+            qtdQuads += 1;
+        }
+        glEnd();
+    }
+    else
+    {
+        qtdTriangulo = 0;
+        glBegin(GL_TRIANGLES);
+        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+        {
+            CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            for(int j = 0; j < 3; j++) // vertices do triangulo
+                glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+            qtdTriangulo += 1;
+        }
+        glEnd();
+    }
 }
 
 void drawObjectWireframe(int numObjeto)
 {
     vertice vetorNormal;
-
-    glBegin(GL_LINE_STRIP);
-    for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+    if (objetoAtual == 5)
     {
-        CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-        for(int j = 0; j < 3; j++){ // vertices do triangulo
-            glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+        qtdTriangulo = 0;
+        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+        {
+            CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            glBegin(GL_LINE_LOOP);
+            for(int j = 0; j < 3; j++) // vertices do triangulo
+                glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+            qtdTriangulo += 1;
+            glEnd();
         }
-        glVertex3d(vetorObjetos.at(numObjeto).at(i).v[0].x,vetorObjetos.at(numObjeto).at(i).v[0].y, vetorObjetos.at(numObjeto).at(i).v[0].z);
+
+        for(int i = 0; i < vetorQuads.size(); i++) // quadrilateros
+        {
+            CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            glBegin(GL_LINE_LOOP);
+            for(int j = 0; j < 3; j++) // vertices do quadrilatero
+                glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
+            glEnd();
+        }
     }
-    glEnd();
+    else
+    {
+        qtdTriangulo = 0;
+        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+        {
+            CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+            glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+            glBegin(GL_LINE_LOOP);
+            for(int j = 0; j < 3; j++) // vertices do triangulo
+                glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+            qtdTriangulo += 1;
+            glEnd();
+
+        }
+
+    }
 
 }
 
@@ -225,7 +332,10 @@ void imprimeTitulo(int objetoAtual)
 {
     char aux[32];
     static char fpsBuf[256] = {0};
-    sprintf(aux, "Objeto %d", objetoAtual+1);
+    if (objetoAtual == 5)
+        sprintf(aux, "Objeto %d, Triangulos: %d, Quads: %d", objetoAtual+1, qtdTriangulo, qtdQuads);
+    else
+        sprintf(aux, "Objeto %d, Triangulos: %d", objetoAtual+1, qtdTriangulo);
     strcpy(fpsBuf, "Desenvolvimento 2 - ");
     strcat(fpsBuf, aux);
     strcat(fpsBuf, " - Press ESC to exit.");
@@ -250,12 +360,12 @@ void display(void)
 
 
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
-        glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-        glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
-        if (wireframe)
-            drawObjectWireframe(objetoAtual);
-        else
-            drawObject(objetoAtual); //Desenha o objeto em 3D
+    glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+    glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+    if (wireframe)
+        drawObjectWireframe(objetoAtual); //Desenha o objeto em wireframe
+    else
+        drawObject(objetoAtual); //Desenha o objeto em 3D
     glPopMatrix(); //Descarta a matriz no topo da pilha
 
     imprimeTitulo(objetoAtual);
@@ -338,11 +448,11 @@ void mouse(int button, int state, int x, int y)
     }
     if(button == 3) // Scroll up
     {
-        zdist+=1.0f;
+        zdist+=0.3f;
     }
     if(button == 4) // Scroll Down
     {
-        zdist-=1.0f;
+        zdist-=0.3f;
     }
 }
 
@@ -362,7 +472,7 @@ int main(int argc, char** argv)
     carregaPLY("bunny.ply", 1);
     carregaPLY("cow.ply", 2);
     carregaPLY("dragon.ply", 3);
-    carregaPLY("dragon_full.ply", 4);
+//    carregaPLY("dragon_full.ply", 4);
     carregaPLY("snowman.ply", 5);
 
     glutDisplayFunc(display);

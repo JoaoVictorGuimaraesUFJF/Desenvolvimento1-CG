@@ -23,7 +23,7 @@ void initLight(int width, int height)
 }
 
 
-void setMaterials(void)
+void setMaterials(int numObjeto)
 {
     // Parametros comuns para os dois lados da superfície
     GLfloat objeto_especular[] = { 0.626, 0.626, 0.626, 1.0 };
