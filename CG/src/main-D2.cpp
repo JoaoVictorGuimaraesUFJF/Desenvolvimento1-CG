@@ -253,39 +253,102 @@ void drawObject(int numObjeto)
         {
             CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
             glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-            for(int j = 0; j < 3; j++) // vertices do quadrilatero
-            //for(int j = 0; j < 4; j++) // vertices do quadrilatero
+            for(int j = 0; j < 4; j++) // vertices do quadrilatero
                 glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
         }
         glEnd();
     }
 }
 
+void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
+{
+    // min = minium coordinate of the box
+    // max = maxium coordinate of the box
+    vertice min = vetorObjetos.at(numObjeto).at(0).v[0];
+    vertice max = vetorObjetos.at(numObjeto).at(0).v[0];
+    for (int i = 0; i < vetorObjetos.at(numObjeto).size(); ++i)
+    {
+        for(int j = 0; j < 3; j++){ // vertices do triangulo
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].x > max.x ) max.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].y > max.y ) max.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+            if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+        }
+    }
+
+//caso seja desenho 5 testar vertices quad
+//    if(numObjeto == 5){
+//        for (int i = 0; i < vetorQuads.size(); ++i)
+//        {
+//            for(int j = 0; j < 4; j++){ // vertices do triangulo
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].x > max.x ) max.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].y > max.y ) max.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+//                if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+//            }
+//        }
+//    }
+
+//desenha bounding box
+//    glBegin(GL_LINES);
+//        glVertex3f(max.x,min.y,max.z);
+//        glVertex3f(min.x,min.y,max.z);
+//        glVertex3f(min.x,min.y,min.z);
+//        glVertex3f(max.x,min.y,min.z);
+//        glVertex3f(max.x,max.y,max.z);
+//        glVertex3f(min.x,max.y,max.z);
+//        glVertex3f(min.x,max.y,min.z);
+//        glVertex3f(max.x,max.y,min.z);
+//
+//        glVertex3f(max.x,min.y,max.z);
+//        glVertex3f(max.x,max.y,max.z);
+//        glVertex3f(min.x,min.y,max.z);
+//        glVertex3f(min.x,max.y,max.z);
+//        glVertex3f(min.x,min.y,min.z);
+//        glVertex3f(min.x,max.y,min.z);
+//        glVertex3f(max.x,min.y,min.z);
+//        glVertex3f(max.x,max.y,min.z);
+//
+//        glVertex3f(max.x,min.y,min.z);
+//        glVertex3f(max.x,min.y,max.z);
+//        glVertex3f(max.x,max.y,min.z);
+//        glVertex3f(max.x,max.y,max.z);
+//        glVertex3f(min.x,min.y,min.z);
+//        glVertex3f(min.x,min.y,max.z);
+//        glVertex3f(min.x,max.y,min.z);
+//        glVertex3f(min.x,max.y,max.z);
+//
+//    glEnd();
+}
+
 void drawObjectWireframe(int numObjeto)
 {
     vertice vetorNormal;
-        for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+    for(int i = 0; i < vetorObjetos.at(numObjeto).size(); i++) // triangulos
+    {
+        CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+        glBegin(GL_LINE_LOOP);
+        for(int j = 0; j < 3; j++) // vertices do triangulo
+            glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+        glEnd();
+    }
+    if (objetoAtual == 5)
+    {
+        for(int i = 0; i < vetorQuads.size(); i++) // quadrilateros
         {
-            CalculaNormal(vetorObjetos.at(numObjeto).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+            CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
             glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
             glBegin(GL_LINE_LOOP);
-            for(int j = 0; j < 3; j++) // vertices do triangulo
-                glVertex3d(vetorObjetos.at(numObjeto).at(i).v[j].x,vetorObjetos.at(numObjeto).at(i).v[j].y, vetorObjetos.at(numObjeto).at(i).v[j].z);
+            for(int j = 0; j < 4; j++) // vertices do quadrilatero
+                glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
             glEnd();
         }
-        if (objetoAtual == 5)
-        {
-            for(int i = 0; i < vetorQuads.size(); i++) // quadrilateros
-            {
-                CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
-                glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-                glBegin(GL_LINE_LOOP);
-                for(int j = 0; j < 3; j++) // vertices do quadrilatero
-                //for(int j = 0; j < 4; j++) // vertices do quadrilatero
-                    glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
-                glEnd();
-            }
-        }
+    }
 }
 
 void imprimeTitulo(int objetoAtual)
@@ -319,9 +382,20 @@ void display(void)
 
     setMaterials(objetoAtual);
 
+    vertice verticeMin;
+    vertice verticeMax;
+    calculaBoundingBox(objetoAtual, &verticeMin, &verticeMax);
+    float altura = verticeMax.y - verticeMin.y;
+
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
+    glTranslatef (0, -altura, 0.0);
+    //glTranslatef (0, -1, 0.0);
+    //colocando -1 no y do translate da pra ver q isso funciona na vaca por exemplo, ela não fica exatamente centralizada
+    //(pq tem q ser a altura e não -1) mas começa a rodar sem ser em volta do eixo das patas - os outros ficam mto pra
+    //baixo pq -1 é mto pra eles, ai usando altura resolveria isso
     glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
     glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+    glTranslatef (0, -altura, 0.0);
     if (wireframe)
         drawObjectWireframe(objetoAtual); //Desenha o objeto em wireframe
     else
@@ -373,12 +447,16 @@ void specialKeys(int key, int x, int y)
             objetoAtual = 5;
         else
             objetoAtual -= 1;
+        rotationX = 0;
+        rotationY = 0;
         break;
     case GLUT_KEY_RIGHT:
         if(objetoAtual >= 5)
             objetoAtual = 0;
         else
             objetoAtual += 1;
+        rotationX = 0;
+        rotationY = 0;
         break;
     case GLUT_KEY_F12:
         (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
