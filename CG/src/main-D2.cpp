@@ -44,6 +44,7 @@ bool wireframe = false;
 int objetoAtual = 0;
 int tamanhoVetorVertice = 0;
 int tamanhoVetorObjeto = 0;
+float altura = 0;
 std::vector< vertice > vetorVertice; //Estrutura utilizada para armazenar os vértices
 std::vector< std::vector<triangle> > vetorObjetos; //Estrutura utilizada para armazenar os objetos
 std::vector< quadrilateral > vetorQuads; //Estrutura utilizada para armazenar os quadrilateros
@@ -268,7 +269,7 @@ void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
     vertice max = vetorObjetos.at(numObjeto).at(0).v[0];
     for (int i = 0; i < vetorObjetos.at(numObjeto).size(); ++i)
     {
-        for(int j = 0; j < 3; j++){ // vertices do triangulo
+        for(int j = 0; j < 3; j++){
             if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
             if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
             if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
@@ -277,6 +278,12 @@ void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
             if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
         }
     }
+    verticeMin->x = min.x;
+    verticeMin->y = min.y;
+    verticeMin->z = min.z;
+    verticeMax->x = max.x;
+    verticeMax->y = max.y;
+    verticeMax->z = max.z;
 
 //caso seja desenho 5 testar vertices quad
 //    if(numObjeto == 5){
@@ -367,6 +374,7 @@ void imprimeTitulo(int objetoAtual)
 
 void display(void)
 {
+    vertice verticeMin, verticeMax;
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
 
     glViewport (0, 0, (GLsizei) width, (GLsizei) height); //Define a visualização na janela da aplicação
@@ -382,17 +390,13 @@ void display(void)
 
     setMaterials(objetoAtual);
 
-    vertice verticeMin;
-    vertice verticeMax;
     calculaBoundingBox(objetoAtual, &verticeMin, &verticeMax);
-    float altura = verticeMax.y - verticeMin.y;
+    printf("verMIN: %f\n", verticeMin.y);
+    printf("verMAX: %f\n", verticeMax.y);
+    altura = verticeMax.y - verticeMin.y;
 
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
     glTranslatef (0, -altura, 0.0);
-    //glTranslatef (0, -1, 0.0);
-    //colocando -1 no y do translate da pra ver q isso funciona na vaca por exemplo, ela não fica exatamente centralizada
-    //(pq tem q ser a altura e não -1) mas começa a rodar sem ser em volta do eixo das patas - os outros ficam mto pra
-    //baixo pq -1 é mto pra eles, ai usando altura resolveria isso
     glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
     glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
     glTranslatef (0, -altura, 0.0);
@@ -433,6 +437,9 @@ void keyboard (unsigned char key, int x, int y)
             wireframe = false;
         else
             wireframe = true;
+        break;
+    case 'p':
+        printf("Altura: %f\n", altura);
         break;
     }
 }
