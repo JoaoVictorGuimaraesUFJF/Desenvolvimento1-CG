@@ -26,7 +26,7 @@ void initLight(int width, int height)
 void setMaterials(int numObjeto)
 {
     if(numObjeto==0){//material budda
-        GLfloat objeto_ambient[]   = { 0.33, 0.22, 0.03, 1.0 };
+        GLfloat objeto_ambient[]  = { 0.33, 0.22, 0.03, 1.0 };
         GLfloat objeto_difusa[]    = { 0.78, 0.57, 0.11, 1.0 };
         GLfloat objeto_especular[] = { 0.99, 0.94, 0.81, 1.0 };
         GLfloat objeto_brilho[]    = { 28.0f };
