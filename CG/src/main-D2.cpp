@@ -354,7 +354,7 @@ void defineCamera(int objetoAtual)
         gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
         break;
     case 2:
-        gluLookAt (0.0, 0.0, 15.0+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        gluLookAt (0.0, 0.0, 10.0+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
         break;
     case 3:
         gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -444,6 +444,7 @@ void display(void)
                 if(objetoAtual == 5)
                 {
                     glRotatef(-90,1.0,0.0,0.0);
+                    glTranslatef (1.1, 0, 0);
                 }
             drawObject(objetoAtual); //Desenha o objeto em 3D
             }
@@ -499,6 +500,7 @@ void specialKeys(int key, int x, int y)
             objetoAtual -= 1;
         rotationX = 0;
         rotationY = 0;
+        zdist = 0.01;
         break;
     case GLUT_KEY_RIGHT:
         if(objetoAtual >= 5)
@@ -507,6 +509,7 @@ void specialKeys(int key, int x, int y)
             objetoAtual += 1;
         rotationX = 0;
         rotationY = 0;
+        zdist = 0.01;
         break;
     case GLUT_KEY_F12:
         (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
