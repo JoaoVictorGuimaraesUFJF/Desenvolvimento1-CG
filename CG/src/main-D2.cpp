@@ -34,7 +34,7 @@ public:
 };
 
 /// Globals
-float zdist = 5.0;
+float zdist = 0.01;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
@@ -254,7 +254,7 @@ void drawObject(int numObjeto)
         {
             CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
             glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-            for(int j = 0; j < 4; j++) // vertices do quadrilatero
+            for(int j = 0; j < 3; j++) // vertices do quadrilatero
                 glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
         }
         glEnd();
@@ -263,13 +263,14 @@ void drawObject(int numObjeto)
 
 void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
 {
-    // min = minium coordinate of the box
-    // max = maxium coordinate of the box
+    // min = Coordenada minima do bounding box
+    // max = Coordenada maxima do bounding box
     vertice min = vetorObjetos.at(numObjeto).at(0).v[0];
     vertice max = vetorObjetos.at(numObjeto).at(0).v[0];
     for (int i = 0; i < vetorObjetos.at(numObjeto).size(); ++i)
     {
-        for(int j = 0; j < 3; j++){
+        for(int j = 0; j < 3; j++)
+        {
             if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
             if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
             if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
@@ -285,23 +286,7 @@ void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
     verticeMax->y = max.y;
     verticeMax->z = max.z;
 
-//caso seja desenho 5 testar vertices quad
-//    if(numObjeto == 5){
-//        for (int i = 0; i < vetorQuads.size(); ++i)
-//        {
-//            for(int j = 0; j < 4; j++){ // vertices do triangulo
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].x > max.x ) max.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].y > max.y ) max.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
-//                if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
-//            }
-//        }
-//    }
-
-//desenha bounding box
-//    glBegin(GL_LINES);
+//    glBegin(GL_LINES);  //Desenha bounding box
 //        glVertex3f(max.x,min.y,max.z);
 //        glVertex3f(min.x,min.y,max.z);
 //        glVertex3f(min.x,min.y,min.z);
@@ -351,10 +336,35 @@ void drawObjectWireframe(int numObjeto)
             CalculaNormalQuad(vetorQuads.at(i), &vetorNormal); // Passa face quadrilateral e endereço do vetor normal de saída
             glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
             glBegin(GL_LINE_LOOP);
-            for(int j = 0; j < 4; j++) // vertices do quadrilatero
+            for(int j = 0; j < 3; j++) // vertices do quadrilatero
                 glVertex3d(vetorQuads.at(i).v[j].x,vetorQuads.at(i).v[j].y, vetorQuads.at(i).v[j].z);
             glEnd();
         }
+    }
+}
+
+void defineCamera(int objetoAtual)
+{
+    switch(objetoAtual) //Define a camera com olho, foco e orientação(up)
+    {
+    case 0:
+        gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
+    case 1:
+        gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
+    case 2:
+        gluLookAt (0.0, 0.0, 15.0+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
+    case 3:
+        gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
+    case 4:
+        gluLookAt (0.0, 0.0, 0.5+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
+    case 5:
+        gluLookAt (0.0, 0.0, 12.0+zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        break;
     }
 }
 
@@ -372,6 +382,29 @@ void imprimeTitulo(int objetoAtual)
     glutSetWindowTitle(fpsBuf);
 }
 
+void desenhaEixos() //Desenha os eixos
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES); //X vermelho
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(-100.0,0.0,0.0);
+    glVertex3f(100.0,0.0,0.0);
+    glEnd();
+
+    glBegin(GL_LINES); //Y verde
+    glColor3f(0.0,1.0,0.0);
+    glVertex3f(0.0,-100.0,0.0);
+    glVertex3f(0.0,100.0,0.0);
+    glEnd();
+
+    glBegin(GL_LINES); //Z azul
+    glColor3f(0.0,0.0,1.0);
+    glVertex3f(0.0,0.0,-100.0);
+    glVertex3f(0.0,0.0,100.0);
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 void display(void)
 {
     vertice verticeMin, verticeMax;
@@ -386,24 +419,37 @@ void display(void)
 
     glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
     glLoadIdentity(); //Matriz identidade
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
+    defineCamera(objetoAtual);
 
     setMaterials(objetoAtual);
 
     calculaBoundingBox(objetoAtual, &verticeMin, &verticeMax);
-    printf("verMIN: %f\n", verticeMin.y);
-    printf("verMAX: %f\n", verticeMax.y);
     altura = verticeMax.y - verticeMin.y;
 
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
-    glTranslatef (0, -altura, 0.0);
-    glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-    glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
-    glTranslatef (0, -altura, 0.0);
-    if (wireframe)
-        drawObjectWireframe(objetoAtual); //Desenha o objeto em wireframe
-    else
-        drawObject(objetoAtual); //Desenha o objeto em 3D
+        glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+        glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+
+        glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
+            glTranslatef (0, -altura/2, 0);
+            if (wireframe){
+                if(objetoAtual == 5)
+                {
+                    glRotatef(-90,1.0,0.0,0.0);
+                }
+                drawObjectWireframe(objetoAtual); //Desenha o objeto em wireframe
+            }
+            else
+            {
+                if(objetoAtual == 5)
+                {
+                    glRotatef(-90,1.0,0.0,0.0);
+                }
+            drawObject(objetoAtual); //Desenha o objeto em 3D
+            }
+        glPopMatrix();
+
+        desenhaEixos();
     glPopMatrix(); //Descarta a matriz no topo da pilha
 
     imprimeTitulo(objetoAtual);
@@ -437,9 +483,6 @@ void keyboard (unsigned char key, int x, int y)
             wireframe = false;
         else
             wireframe = true;
-        break;
-    case 'p':
-        printf("Altura: %f\n", altura);
         break;
     }
 }
@@ -493,11 +536,33 @@ void mouse(int button, int state, int x, int y)
     }
     if(button == 3) // Scroll up
     {
-        zdist+=0.3f;
+        if(objetoAtual == 0)
+            zdist+=0.01f;
+        if(objetoAtual == 1)
+            zdist+=0.01f;
+        if(objetoAtual == 2)
+            zdist+=0.2f;
+        if(objetoAtual == 3)
+            zdist+=0.01f;
+        if(objetoAtual == 4)
+            zdist+=0.01f;
+        if(objetoAtual == 5)
+            zdist+=0.f;
     }
     if(button == 4) // Scroll Down
     {
-        zdist-=0.3f;
+        if(objetoAtual == 0)
+            zdist-=0.01f;
+        if(objetoAtual == 1)
+            zdist-=0.01f;
+        if(objetoAtual == 2)
+            zdist-=0.2f;
+        if(objetoAtual == 3)
+            zdist-=0.01f;
+        if(objetoAtual == 4)
+            zdist-=0.01f;
+        if(objetoAtual == 5)
+            zdist-=0.f;
     }
 }
 
