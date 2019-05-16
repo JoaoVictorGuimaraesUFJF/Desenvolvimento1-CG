@@ -35,6 +35,7 @@ int   width, height;
 int altura = 1, grupo = 1, espessura = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
+bool edicao = false;
 std::string nomeArquivo;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
@@ -42,7 +43,7 @@ std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para arm
 void init(void)
 {
     initLight(width, height); // Função extra para tratar iluminação.
-    setMaterials();
+    setMaterials(1);
 }
 
 void salvarModelo(std::string outFileName)
@@ -54,7 +55,7 @@ void salvarModelo(std::string outFileName)
 
     if (!outFile.is_open())
     {
-      std::cout << "Falha na criação do arquivo" << std::endl;
+        std::cout << "Falha na criação do arquivo" << std::endl;
     }
     else
     {
@@ -90,15 +91,15 @@ void salvarModelo(std::string outFileName)
 }
 
 std::vector<std::string> explode(std::string const & string, char delimiter)
-  {
+{
     std::vector<std::string> result;
     std::istringstream iss(string);
 
     for (std::string token; std::getline(iss, token, delimiter); )
-      result.push_back(std::move(token));
+        result.push_back(std::move(token));
 
     return result;
-  }
+}
 
 void carregarModelo(std::string inFileName)
 {
@@ -108,7 +109,7 @@ void carregarModelo(std::string inFileName)
 
     if (!inFile.is_open())
     {
-      std::cout << "Falha na leitura do arquivo" << std::endl;
+        std::cout << "Falha na leitura do arquivo" << std::endl;
     }
     else
     {
@@ -205,7 +206,8 @@ void CalculaOrtogonal(vertice v0, vertice v1, vertice *vo)
 
 }
 
-void showMenu(){
+void showMenu()
+{
     printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
     printf("Use as setas DIREITA/ESQUERDA para alterar o grupo.\n");
     printf("Use as setas CIMA/BAIXO para alterar a altura.\n");
@@ -385,30 +387,30 @@ void drawObject()
 void desenhaEixos() //Desenha os eixos
 {
     glDisable(GL_LIGHTING);
-        glBegin(GL_LINES);
-            glColor3f(1.0,0.0,0.0);
-            glVertex3f(-100.0,0.0,0.0);
-            glVertex3f(100.0,0.0,0.0);
-        glEnd();
+    glBegin(GL_LINES);
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(-100.0,0.0,0.0);
+    glVertex3f(100.0,0.0,0.0);
+    glEnd();
 
-        glBegin(GL_LINES);
-            glColor3f(0.0,1.0,0.0);
-            glVertex3f(0.0,-100.0,0.0);
-            glVertex3f(0.0,100.0,0.0);
-        glEnd();
+    glBegin(GL_LINES);
+    glColor3f(0.0,1.0,0.0);
+    glVertex3f(0.0,-100.0,0.0);
+    glVertex3f(0.0,100.0,0.0);
+    glEnd();
     glEnable(GL_LIGHTING);
 }
 
 void desenhaPonto2D(vertice v) //Função auxiliar de desenho
 {
     glDisable(GL_LIGHTING);
-        float x=v.x;
-        float y=v.y;
-        glPointSize(10.0); //Define o tamanho do ponto
-        glColor3f(1.0f, 0.0f, 0.0f); //Define cor do ponto
-        glBegin(GL_POINTS);
-            glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-        glEnd();
+    float x=v.x;
+    float y=v.y;
+    glPointSize(10.0); //Define o tamanho do ponto
+    glColor3f(1.0f, 0.0f, 0.0f); //Define cor do ponto
+    glBegin(GL_POINTS);
+    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
+    glEnd();
     glEnable(GL_LIGHTING);
 
 }
@@ -416,18 +418,18 @@ void desenhaPonto2D(vertice v) //Função auxiliar de desenho
 void desenhaPontosOrtogonais(vertice v) //Função auxiliar de desenho
 {
     glDisable(GL_LIGHTING);
-        glPointSize(10.0); //Define o tamanho do ponto
-        glColor3f(0.0f, 1.0f, 1.0f); //Define cor do ponto
-        float x=v.x0;
-        float y=v.y0;
-        glBegin(GL_POINTS);
-            glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-        glEnd();
-        x=v.x1;
-        y=v.y1;
-        glBegin(GL_POINTS);
-            glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
-        glEnd();
+    glPointSize(10.0); //Define o tamanho do ponto
+    glColor3f(0.0f, 1.0f, 1.0f); //Define cor do ponto
+    float x=v.x0;
+    float y=v.y0;
+    glBegin(GL_POINTS);
+    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
+    glEnd();
+    x=v.x1;
+    y=v.y1;
+    glBegin(GL_POINTS);
+    glVertex2f(x,y); //Cria o ponto nas coordenadas X e Y
+    glEnd();
     glEnable(GL_LIGHTING);
 
 }
@@ -471,50 +473,80 @@ void imprimeTitulo(int grupo, int altura, int espessura)
 
 void display(void)
 {
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
-///--------------Primeira Viewport----------------------------------------------------
-    glViewport (0, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
-    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
-    glScissor(0, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
-    glClearColor(1.0,1.0,1.0,0.0); //Define cor de fundo da viewport
-    glMatrixMode (GL_PROJECTION); //Matriz de projeção
-    glLoadIdentity (); //Matriz identidade
-    glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f); //Define uma região de visualização ortogonal
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
-    glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
-    glLoadIdentity(); //Matriz identidade
+    if(edicao)
+    {
+        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
+        ///--------------Primeira Viewport----------------------------------------------------
+        glViewport (0, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
+        glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
+        glScissor(0, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
+        glClearColor(1.0,1.0,1.0,0.0); //Define cor de fundo da viewport
+        glMatrixMode (GL_PROJECTION); //Matriz de projeção
+        glLoadIdentity (); //Matriz identidade
+        glOrtho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f); //Define uma região de visualização ortogonal
+        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
+        glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
+        glLoadIdentity(); //Matriz identidade
 
-    desenhaEixos(); //Desenha os eixos em 2D
-    glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
-    desenhaPontos(); //Desenha os pontos no 2D
+        desenhaEixos(); //Desenha os eixos em 2D
+        glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
+        desenhaPontos(); //Desenha os pontos no 2D
 
+        ///--------------Segunda Viewport-----------------------------------------------------
+        glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
+        glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
+        glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
+        glClearColor(0.0,0.0,0.0,0.0); //Define cor de fundo da viewport
 
-///--------------Segunda Viewport-----------------------------------------------------
+        glMatrixMode (GL_PROJECTION); //Matriz de projeção
+        glLoadIdentity (); //Matriz identidade
+        gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
 
-    glViewport (width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define a visualização na janela da aplicação
-    glEnable(GL_SCISSOR_TEST); //Para 'recortar' a janela
-    glScissor(width/2, 0, (GLsizei) width/2, (GLsizei) height); //Define area de recorte
-    glClearColor(0.0,0.0,0.0,0.0); //Define cor de fundo da viewport
-
-    glMatrixMode (GL_PROJECTION); //Matriz de projeção
-    glLoadIdentity (); //Matriz identidade
-    gluPerspective(60.0, (GLfloat) (width/2)/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
-
-    glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
-    glLoadIdentity(); //Matriz identidade
-    gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
+        glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
+        glLoadIdentity(); //Matriz identidade
+        gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
 
 
 
-    glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
+        glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
         glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
         glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
         drawObject(); //Desenha o objeto em 3D
-    glPopMatrix(); //Descarta a matriz no topo da pilha
+        glPopMatrix(); //Descarta a matriz no topo da pilha
 
-    glutSwapBuffers(); //Troca os buffers
+        glutSwapBuffers(); //Troca os buffers
 
-    imprimeTitulo(grupo, altura, espessura);
+        imprimeTitulo(grupo, altura, espessura);
+    }
+    else
+    {
+        glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
+        glDisable(GL_SCISSOR_TEST);
+        glViewport (0, 0, (GLsizei) width, (GLsizei) height); //Define a visualização na janela da aplicação
+        glClearColor(0.0,0.0,0.0,0.0); //Define cor de fundo da viewport
+
+        glMatrixMode (GL_PROJECTION); //Matriz de projeção
+        glLoadIdentity (); //Matriz identidade
+        gluPerspective(60.0, (GLfloat) width/(GLfloat) height, 0.01, 200.0); //Define projeções perspectivas
+
+        glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
+        glLoadIdentity(); //Matriz identidade
+        gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
+
+        glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
+            glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+            glRotatef( -85 + rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+            glBegin(GL_QUADS);
+                glVertex3f(-100,100,0);
+                glVertex3f(100,100,0);
+                glVertex3f(100,-100,0);
+                glVertex3f(-100,-100,0);
+            glEnd();
+            drawObject(); //Desenha o objeto em 3D
+        glPopMatrix(); //Descarta a matriz no topo da pilha
+
+        glutSwapBuffers(); //Troca os buffers
+    }
 }
 
 void idle ()
@@ -559,6 +591,13 @@ void keyboard (unsigned char key, int x, int y)
         std::cin >> nomeArquivo;
         salvarModelo(nomeArquivo);
         break;
+    case 'm':
+        if(edicao)
+            edicao = false;
+        else
+            edicao = true;
+        break;
+
     }
 }
 
@@ -608,7 +647,8 @@ void mouse(int button, int state, int x, int y)
 {
     if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
     {
-        if(x<=width/2){
+        if(edicao == true && x<=width/2)
+        {
             vertice v;
             v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
             v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
@@ -618,7 +658,8 @@ void mouse(int button, int state, int x, int y)
                 vetorVertice.resize(grupo);
             }
 
-            if(!vetorVertice.at(grupo-1).empty()){
+            if(!vetorVertice.at(grupo-1).empty())
+            {
                 CalculaOrtogonal(v, vetorVertice.at(grupo-1).back(), &vetorOrtogonal);
                 v.x0 = v.x + vetorOrtogonal.x*(-espessura)/10;
                 v.y0 = v.y + vetorOrtogonal.y*(-espessura)/10;
