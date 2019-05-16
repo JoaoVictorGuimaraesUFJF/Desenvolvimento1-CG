@@ -35,7 +35,7 @@ int   width, height;
 int altura = 1, grupo = 1, espessura = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
-bool edicao = false;
+bool edicao = true;
 std::string nomeArquivo;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
@@ -537,10 +537,10 @@ void display(void)
             glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
             glRotatef( -85 + rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
             glBegin(GL_QUADS);
-                glVertex3f(-100,100,0);
-                glVertex3f(100,100,0);
-                glVertex3f(100,-100,0);
-                glVertex3f(-100,-100,0);
+                glVertex3f(-10,10,0);
+                glVertex3f(10,10,0);
+                glVertex3f(10,-10,0);
+                glVertex3f(-10,-10,0);
             glEnd();
             drawObject(); //Desenha o objeto em 3D
         glPopMatrix(); //Descarta a matriz no topo da pilha
