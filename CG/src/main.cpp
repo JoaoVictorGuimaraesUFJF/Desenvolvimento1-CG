@@ -37,6 +37,7 @@ vertice vetorOrtogonal;
 bool fullScreen = false;
 bool edicao = true;
 std::string nomeArquivo;
+std::vector< std::vector<triangle> > triangulos; //vetor para armazenar triângulos
 std::vector<int> vetorMateriais;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
@@ -225,11 +226,8 @@ void showMenu()
 void drawObject()
 {
     vertice vetorNormal;
-    std::vector<triangle> triangulos; //vetor para armazenar triângulos
-
     for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
     {
-        setMaterials(vetorMateriais.at(i));
         if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
         {
             for(int j=1; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
@@ -245,7 +243,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j-1).x0;
                 tri.v[2].y=vetorVertice.at(i).at(j-1).y0;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///1
                 tri.v[0].x=vetorVertice.at(i).at(j).x0;
                 tri.v[0].y=vetorVertice.at(i).at(j).y0;
@@ -256,7 +254,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x0;
                 tri.v[2].y=vetorVertice.at(i).at(j).y0;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///2
                 tri.v[0].x=vetorVertice.at(i).at(j).x1;
                 tri.v[0].y=vetorVertice.at(i).at(j).y1;
@@ -267,7 +265,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///3
                 tri.v[0].x=vetorVertice.at(i).at(j).x1;
                 tri.v[0].y=vetorVertice.at(i).at(j).y1;
@@ -278,7 +276,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///4
 
                 tri.v[0].x=vetorVertice.at(i).at(j-1).x0;
@@ -290,7 +288,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
                 tri.v[2].z=vetorVertice.at(i).at(j-1).z;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///5
                 tri.v[0].x=vetorVertice.at(i).at(j-1).x0;
                 tri.v[0].y=vetorVertice.at(i).at(j-1).y0;
@@ -301,7 +299,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///6
                 tri.v[0].x=vetorVertice.at(i).at(j).x0;
                 tri.v[0].y=vetorVertice.at(i).at(j).y0;
@@ -312,7 +310,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///7
                 tri.v[0].x=vetorVertice.at(i).at(j).x1;
                 tri.v[0].y=vetorVertice.at(i).at(j).y1;
@@ -323,7 +321,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///8
                 tri.v[0].x=vetorVertice.at(i).at(j).x0;
                 tri.v[0].y=vetorVertice.at(i).at(j).y0;
@@ -334,7 +332,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///9
                 tri.v[0].x=vetorVertice.at(i).at(j-1).x1;
                 tri.v[0].y=vetorVertice.at(i).at(j-1).y1;
@@ -345,7 +343,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///10
                 tri.v[0].x=vetorVertice.at(i).at(j).x0;
                 tri.v[0].y=vetorVertice.at(i).at(j).y0;
@@ -356,7 +354,7 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///11
                 tri.v[0].x=vetorVertice.at(i).at(j-1).x1;
                 tri.v[0].y=vetorVertice.at(i).at(j-1).y1;
@@ -367,22 +365,28 @@ void drawObject()
                 tri.v[2].x=vetorVertice.at(i).at(j).x1;
                 tri.v[2].y=vetorVertice.at(i).at(j).y1;
                 tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.push_back(tri);
+                triangulos.at(i).push_back(tri);
                 ///12
             }
         }
     }
-
-    glBegin(GL_TRIANGLES);
-    for(int i = 0; i < triangulos.size(); i++) // triangulos
+    for(int i=0; i < triangulos.size(); i++)
     {
-        CalculaNormal(triangulos.at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-        for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(triangulos.at(i).v[j].x,triangulos.at(i).v[j].y, triangulos.at(i).v[j].z);
+        if(!triangulos.at(i).empty() && triangulos.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        {
+            setMaterials(vetorMateriais.at(i));
+            glBegin(GL_TRIANGLES);
+            for(int j = 0; j < triangulos.at(i).size(); j++) // triangulos
+            {
+                CalculaNormal(triangulos.at(i).at(j), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+                glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+                for(int k = 0; k < 3; k++) // vertices do triangulo
+                    glVertex3d(triangulos.at(i).at(j).v[k].x,triangulos.at(i).at(j).v[k].y, triangulos.at(i).at(j).v[k].z);
+            }
+            glEnd();
+        }
+        triangulos.at(i).clear();
     }
-    glEnd();
-
 }
 
 void desenhaEixos() //Desenha os eixos
@@ -548,6 +552,8 @@ void display(void)
         glPopMatrix(); //Descarta a matriz no topo da pilha
 
         glutSwapBuffers(); //Troca os buffers
+
+        glutSetWindowTitle("T2 - Ambiente Virtual - Press ESC to exit.");
     }
 }
 
@@ -566,85 +572,112 @@ void reshape (int w, int h)
 
 void keyboard (unsigned char key, int x, int y)
 {
-
-    switch (tolower(key))
+    if(edicao){
+        switch (tolower(key))
+        {
+        case 27:
+            exit(0);
+            break;
+        case '.':
+            espessura += 1;
+            break;
+        case ',':
+            if(espessura <= 1)
+                espessura = 1;
+            else
+                espessura -= 1;
+            break;
+        case 'l':
+            //carregar
+            printf("Digite o nome do modelo a ser carregado: \n");
+            std::cin >> nomeArquivo;
+            carregarModelo(nomeArquivo);
+            break;
+        case 's':
+            //salvar
+            printf("Digite o nome do modelo a ser salvo: \n");
+            std::cin >> nomeArquivo;
+            salvarModelo(nomeArquivo);
+            break;
+        case 'm':
+            if(edicao)
+                edicao = false;
+            else
+                edicao = true;
+            break;
+        case 'p':
+            //incluir objeto ply
+            break;
+        case 'x':
+            if(material >= 6)
+                material = 6;
+            else
+                material += 1;
+            break;
+        case 'z':
+            if(material <= 1)
+                material = 1;
+            else
+                material -= 1;
+            break;
+        }
+    }
+    else
     {
-    case 27:
-        exit(0);
-        break;
-    case '.':
-        espessura += 1;
-        break;
-    case ',':
-        if(espessura <= 1)
-            espessura = 1;
-        else
-            espessura -= 1;
-        break;
-    case 'l':
-        //carregar
-        printf("Digite o nome do modelo a ser carregado: \n");
-        std::cin >> nomeArquivo;
-        carregarModelo(nomeArquivo);
-        break;
-    case 's':
-        //salvar
-        printf("Digite o nome do modelo a ser salvo: \n");
-        std::cin >> nomeArquivo;
-        salvarModelo(nomeArquivo);
-        break;
-    case 'm':
-        if(edicao)
-            edicao = false;
-        else
-            edicao = true;
-        break;
-    case 'p':
-        //incluir objeto ply
-        break;
-    case 'x':
-        if(material >= 6)
-            material = 6;
-        else
-            material += 1;
-        break;
-    case 'z':
-        if(material <= 1)
-            material = 1;
-        else
-            material -= 1;
-        break;
-
+        switch (tolower(key))
+        {
+        case 27:
+            exit(0);
+            break;
+        case 'm':
+            if(edicao)
+                edicao = false;
+            else
+                edicao = true;
+            break;
+        }
     }
 }
 
 // Special Keys callback
 void specialKeys(int key, int x, int y)
 {
-    switch(key)
+    if(edicao){
+        switch(key)
+        {
+        case GLUT_KEY_LEFT:
+            if(grupo <= 1)
+                grupo = 1;
+            else
+                grupo -= 1;
+            break;
+        case GLUT_KEY_RIGHT:
+            grupo += 1;
+            break;
+        case GLUT_KEY_UP:
+            altura += 1;
+            break;
+        case GLUT_KEY_DOWN:
+            if(altura <= 1)
+                altura = 1;
+            else
+                altura -= 1;
+            break;
+        case GLUT_KEY_F12:
+            (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
+            fullScreen = !fullScreen;
+            break;
+        }
+    }
+    else
     {
-    case GLUT_KEY_LEFT:
-        if(grupo <= 1)
-            grupo = 1;
-        else
-            grupo -= 1;
-        break;
-    case GLUT_KEY_RIGHT:
-        grupo += 1;
-        break;
-    case GLUT_KEY_UP:
-        altura += 1;
-        break;
-    case GLUT_KEY_DOWN:
-        if(altura <= 1)
-            altura = 1;
-        else
-            altura -= 1;
-        break;
-    case GLUT_KEY_F12:
-        (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
-        fullScreen = !fullScreen;
-        break;
+        switch(key)
+        {
+        case GLUT_KEY_F12:
+            (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
+            fullScreen = !fullScreen;
+            break;
+        }
     }
     glutPostRedisplay();
 }
@@ -674,6 +707,7 @@ void mouse(int button, int state, int x, int y)
             {
                 vetorVertice.resize(grupo);
                 vetorMateriais.resize(grupo);
+                triangulos.resize(grupo);
             }
             vetorMateriais.at(grupo - 1) = material;
             if(!vetorVertice.at(grupo - 1).empty())
