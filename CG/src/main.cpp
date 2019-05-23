@@ -32,18 +32,18 @@ float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
 int   last_x, last_y;
 int   width, height;
-int altura = 1, grupo = 1, espessura = 1; //Variaveis
+int altura = 1, grupo = 1, espessura = 1, material = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
 bool edicao = true;
 std::string nomeArquivo;
+std::vector<int> vetorMateriais;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
 /// Functions
 void init(void)
 {
     initLight(width, height); // Função extra para tratar iluminação.
-    setMaterials(1);
 }
 
 void salvarModelo(std::string outFileName)
@@ -229,6 +229,7 @@ void drawObject()
 
     for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
     {
+        setMaterials(vetorMateriais.at(i));
         if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
         {
             for(int j=1; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
@@ -460,11 +461,11 @@ void excluirPonto(int grupo) //Apaga os pontos
     }
 }
 
-void imprimeTitulo(int grupo, int altura, int espessura)
+void imprimeTitulo(int grupo, int altura, int espessura, int material)
 {
-    char aux[32];
+    char aux[128];
     static char fpsBuf[256] = {0};
-    sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i ", grupo, altura,espessura);
+    sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i , Material: %i ", grupo, altura,espessura, material);
     strcpy(fpsBuf, "Desenvolvimento 1 - ");
     strcat(fpsBuf, aux);
     strcat(fpsBuf, "- Press ESC to exit.");
@@ -516,7 +517,7 @@ void display(void)
 
         glutSwapBuffers(); //Troca os buffers
 
-        imprimeTitulo(grupo, altura, espessura);
+        imprimeTitulo(grupo, altura, espessura, material);
     }
     else
     {
@@ -533,6 +534,7 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
         gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
 
+        setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
             glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
             glRotatef( -85 + rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
@@ -597,6 +599,21 @@ void keyboard (unsigned char key, int x, int y)
         else
             edicao = true;
         break;
+    case 'p':
+        //incluir objeto ply
+        break;
+    case 'x':
+        if(material >= 6)
+            material = 6;
+        else
+            material += 1;
+        break;
+    case 'z':
+        if(material <= 1)
+            material = 1;
+        else
+            material -= 1;
+        break;
 
     }
 }
@@ -656,9 +673,10 @@ void mouse(int button, int state, int x, int y)
             if(vetorVertice.size() < grupo)
             {
                 vetorVertice.resize(grupo);
+                vetorMateriais.resize(grupo);
             }
-
-            if(!vetorVertice.at(grupo-1).empty())
+            vetorMateriais.at(grupo - 1) = material;
+            if(!vetorVertice.at(grupo - 1).empty())
             {
                 CalculaOrtogonal(v, vetorVertice.at(grupo-1).back(), &vetorOrtogonal);
                 v.x0 = v.x + vetorOrtogonal.x*(-espessura)/10;
@@ -680,10 +698,6 @@ void mouse(int button, int state, int x, int y)
     }
     if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
     {
-        if(vetorVertice.size() < grupo)
-        {
-            vetorVertice.resize(grupo);
-        }
         excluirPonto(grupo);
     }
     if(button == 3) // Scroll up
