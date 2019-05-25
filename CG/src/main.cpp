@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 
+#include "camera.h"
 #include "extras.h"
 
 /// Estruturas iniciais para armazenar vertices
@@ -35,16 +36,28 @@ int   width, height;
 int altura = 1, grupo = 1, espessura = 1, material = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
+
+bool releaseMouse = false;
+bool inverseMouse = true;
+
 bool edicao = true;
 std::string nomeArquivo;
 std::vector< std::vector<triangle> > triangulos; //vetor para armazenar triângulos
 std::vector<int> vetorMateriais;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
+Camera g_camera;
+bool g_key[256];
+float g_translation_speed = 0.005;
+float g_rotation_speed = M_PI/180*0.2;
+
 /// Functions
 void init(void)
 {
+    float pos[3] = {0.0f, 0.1f, -0.1f};
     initLight(width, height); // Função extra para tratar iluminação.
+	g_camera.SetPos(pos[0], pos[1], pos[2]);
+
 }
 
 void salvarModelo(std::string outFileName)
@@ -391,14 +404,14 @@ void drawObject()
 
 void desenhaEixos() //Desenha os eixos
 {
-    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHTING); ///X VERMELHO
     glBegin(GL_LINES);
     glColor3f(1.0,0.0,0.0);
     glVertex3f(-100.0,0.0,0.0);
     glVertex3f(100.0,0.0,0.0);
     glEnd();
 
-    glBegin(GL_LINES);
+    glBegin(GL_LINES); ///Y VERDE
     glColor3f(0.0,1.0,0.0);
     glVertex3f(0.0,-100.0,0.0);
     glVertex3f(0.0,100.0,0.0);
@@ -511,8 +524,6 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
         gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
 
-
-
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
         glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
         glRotatef( rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
@@ -536,19 +547,20 @@ void display(void)
 
         glMatrixMode (GL_MODELVIEW); //Matriz de Desenho
         glLoadIdentity(); //Matriz identidade
-        gluLookAt (0.0, 0.0, zdist, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0); //Define a camera com olho, foco e orientação(up)
+        g_camera.Refresh();
 
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
-            glRotatef( rotationY, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-            glRotatef( -85 + rotationX, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
             glBegin(GL_QUADS);
-                glVertex3f(-10,10,0);
-                glVertex3f(10,10,0);
-                glVertex3f(10,-10,0);
-                glVertex3f(-10,-10,0);
+                glVertex3f(-10,0,10);
+                glVertex3f(10,0,10);
+                glVertex3f(10,0,-10);
+                glVertex3f(-10,0,-10);
             glEnd();
-            drawObject(); //Desenha o objeto em 3D
+            glPushMatrix();
+                glRotatef( -90, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
+                drawObject(); //Desenha o objeto em 3D
+            glPopMatrix();
         glPopMatrix(); //Descarta a matriz no topo da pilha
 
         glutSwapBuffers(); //Troca os buffers
@@ -568,11 +580,17 @@ void reshape (int w, int h)
     height = h;
 
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+    glMatrixMode (GL_PROJECTION); //set the matrix to projection
+
+    glLoadIdentity ();
+    //gluPerspective (60, (GLfloat)w / (GLfloat)h, 0.1 , 1000.0); //set the perspective (angle of sight, width, height, ,depth)
+    //glMatrixMode (GL_MODELVIEW); //set the matrix back to model
 }
 
 void keyboard (unsigned char key, int x, int y)
 {
-    if(edicao){
+    if(edicao)
+    {
         switch (tolower(key))
         {
         case 27:
@@ -637,12 +655,14 @@ void keyboard (unsigned char key, int x, int y)
             break;
         }
     }
+    g_key[key] = true;
 }
 
 // Special Keys callback
 void specialKeys(int key, int x, int y)
 {
-    if(edicao){
+    if(edicao)
+    {
         switch(key)
         {
         case GLUT_KEY_LEFT:
@@ -682,14 +702,68 @@ void specialKeys(int key, int x, int y)
     glutPostRedisplay();
 }
 
+void KeyboardUp(unsigned char key, int x, int y)
+{
+    g_key[key] = false;
+}
+
+void Timer(int value)
+{
+    float speed = g_translation_speed;
+
+    if(g_key['w'] || g_key['W'])
+    {
+        g_camera.Move(speed);
+    }
+    else if(g_key['s'] || g_key['S'])
+    {
+        g_camera.Move(-speed);
+    }
+    else if(g_key['a'] || g_key['A'])
+    {
+        g_camera.Strafe(speed);
+    }
+    else if(g_key['d'] || g_key['D'])
+    {
+        g_camera.Strafe(-speed);
+    }
+
+    glutTimerFunc(1, Timer, 0);
+}
+
 // Motion callback
 void motion(int x, int y )
 {
-    rotationX += (float) (y - last_y);
-    rotationY += (float) (x - last_x);
+    if(edicao)
+    {
+        rotationX += (float) (y - last_y);
+        rotationY += (float) (x - last_x);
 
-    last_x = x;
-    last_y = y;
+        last_x = x;
+        last_y = y;
+    }
+    else
+    {
+        static bool just_warped = false;
+
+        if(just_warped)
+        {
+            just_warped = false;
+            return;
+        }
+
+        int dx = x - width/2;
+        int dy = y - height/2;
+
+        if(inverseMouse) dy = height/2-y;
+
+        if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
+        if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
+
+        if(!releaseMouse)	glutWarpPointer(width/2, height/2);
+
+        just_warped = true;
+    }
 }
 
 // Mouse callback
@@ -761,6 +835,10 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);
     glutSpecialFunc( specialKeys );
     glutIdleFunc(idle);
+
+    glutKeyboardUpFunc(KeyboardUp);
+    glutTimerFunc(1, Timer, 0);
+
     glutMainLoop();
     return 0;
 }

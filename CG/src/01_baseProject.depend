@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1558039923 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1558811396 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -31,6 +31,7 @@
 	<fstream>
 	<string>
 	<sstream>
+	"camera.h"
 	"extras.h"
 
 1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
@@ -70,7 +71,7 @@
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
-1558039923 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
+1558643637 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
 
 1558632294 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 
@@ -103,4 +104,12 @@
 	<string>
 	<sstream>
 	"extras.h"
+
+1558800969 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/camera.cpp
+	<stdio.h>
+	<math.h>
+	<GL/glut.h>
+	"camera.h"
+
+1558799707 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/camera.h
 
