@@ -36,16 +36,20 @@ int   width, height;
 int altura = 1, grupo = 1, espessura = 1, material = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
-
 bool releaseMouse = false;
-bool inverseMouse = true;
-
 bool edicao = true;
 std::string nomeArquivo;
 std::vector< std::vector<triangle> > triangulos; //vetor para armazenar triângulos
 std::vector<int> vetorMateriais;
 std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
 
+//Ler .ply
+int tamanhoVetorVertices = 0;
+int tamanhoVetorObjeto = 0;
+std::vector< vertice > vetorVertices; //Estrutura utilizada para armazenar os vértices
+std::vector< std::vector<triangle> > vetorObjetos; //Estrutura utilizada para armazenar os objetos
+
+//Camera
 Camera g_camera;
 bool g_key[256];
 float g_translation_speed = 0.005;
@@ -117,8 +121,6 @@ std::vector<std::string> explode(std::string const & string, char delimiter)
 
 void carregarModelo(std::string inFileName)
 {
-    //std::ofstream outFile(outFileName, std::ifstream::out);
-
     std::ifstream inFile("../Modelos/" + inFileName);
 
     if (!inFile.is_open())
@@ -158,6 +160,88 @@ void carregarModelo(std::string inFileName)
         inFile.close();
         std::cout << "Modelo carregado com sucesso!" << std::endl;
     }
+}
+
+void carregaPLY(std::string inFileName, int id)
+{
+    std::ifstream inFile("../plyObjects/" + inFileName);
+
+    if (!inFile.is_open())
+    {
+        std::cout << "Falha na leitura do arquivo" << std::endl;
+    }
+    else
+    {
+        vetorVertices.clear();
+        std::string line;
+        std::vector<std::string> data;
+
+        while (std::getline(inFile, line) && line!="end_header") //Lê cabeçalho
+        {
+            if(!line.empty())
+            {
+                data = explode(line, ' ');
+                if (data[0] == "element")
+                {
+                    if (data[1] == "vertex")
+                    {
+                        tamanhoVetorVertices = std::stoi(data[2]);
+
+                    }
+                    else if (data[1] == "face")
+                    {
+                        tamanhoVetorObjeto = std::stoi(data[2]);
+                    }
+                }
+            }
+        }
+
+
+        for(int i = 0; i < tamanhoVetorVertices; i++)
+        {
+            std::getline(inFile, line);
+            data = explode(line, ' ');
+            vertice v;
+            v.x = std::stof (data[0]);
+            v.y = std::stof (data[1]);
+            v.z = std::stof (data[2]);
+            vetorVertices.push_back(v);
+        }
+
+        for(int i = 0; i < tamanhoVetorObjeto; i++)
+        {
+            std::getline(inFile, line);
+            data = explode(line, ' ');
+            triangle tri;
+            if(data[0] == "3")
+            {
+                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
+                tri.v[1] = vetorVertices.at(std::stoi(data[2]));
+                tri.v[2] = vetorVertices.at(std::stoi(data[3]));
+                vetorObjetos.at(id).push_back(tri);
+            }
+            else if (data[0] == "4")
+            {
+                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
+                tri.v[1] = vetorVertices.at(std::stoi(data[2]));
+                tri.v[2] = vetorVertices.at(std::stoi(data[3]));
+                vetorObjetos.at(id).push_back(tri);
+
+                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
+                tri.v[1] = vetorVertices.at(std::stoi(data[3]));
+                tri.v[2] = vetorVertices.at(std::stoi(data[4]));
+                vetorObjetos.at(id).push_back(tri);
+            }
+        }
+
+    }
+    inFile.close();
+    std::cout << "Ply carregado com sucesso!" << std::endl;
+}
+
+void adicionaPLY(int id, float x, float y, float z){
+
+    ///ADICIONA O .PLY NO AMBIENTE NA POSIÇÃO X, Y, Z PASSADA POR PARAMETRO PELO USUARIO
 }
 
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
@@ -222,17 +306,21 @@ void CalculaOrtogonal(vertice v0, vertice v1, vertice *vo)
 
 void showMenu()
 {
-    printf("Trabalho 1 - João Victor Guimarães e Thaynara Ferreira\n");
+    printf("Trabalho 2 - João Victor Guimarães e Thaynara Ferreira\n");
     printf("Use as setas DIREITA/ESQUERDA para alterar o grupo.\n");
     printf("Use as setas CIMA/BAIXO para alterar a altura.\n");
     printf("Use '.' ou ',' para alterar a espessura.\n");
+    printf("Use 'z' ou 'x' para alterar o material do grupo.\n");
     printf("Use 's' para salvar o modelo.\n");
     printf("Use 'l' para carregar um modelo.\n");
+    printf("Use 'p' para carregar um arquivo ply.\n");
     printf("Use F12 para colocar em fullscreen.\n");
-    printf("Use o scroll do mouse para zoom.\n");
-    printf("Use o botão ESQUERDO do mouse para ADICIONAR pontos no 2D.\n");
-    printf("Use o botão DIREITO do mouse para REMOVER pontos no 2D.\n");
-    printf("Clique e arraste o mouse para rotacionar o modelo gerado em 3D.\n");
+    printf("Use 'm' para ativar/desativar para o modo de navegação.\n");
+    printf("Use o scroll do mouse para zoom no modo de edição.\n");
+    printf("Use o botão ESQUERDO do mouse para ADICIONAR pontos no 2D no modo de edição.\n");
+    printf("Use o botão DIREITO do mouse para REMOVER pontos no 2D no modo de edição.\n");
+    printf("Clique e arraste o mouse para rotacionar o modelo gerado em 3D no modo de edição\n");
+    printf("Clique e arraste o mouse para rotacionar a câmera no modo de navegação.\n");
     printf("Use ESC para sair.\n");
 }
 
@@ -401,6 +489,32 @@ void drawObject()
         triangulos.at(i).clear();
     }
 }
+
+//void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
+//{
+//    // min = Coordenada minima do bounding box
+//    // max = Coordenada maxima do bounding box
+//    vertice min = vetorObjetos.at(numObjeto).at(0).v[0];
+//    vertice max = vetorObjetos.at(numObjeto).at(0).v[0];
+//    for (int i = 0; i < vetorObjetos.at(numObjeto).size(); ++i)
+//    {
+//        for(int j = 0; j < 3; j++)
+//        {
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].x > max.x ) max.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].y > max.y ) max.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
+//            if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+//        }
+//    }
+//    verticeMin->x = min.x;
+//    verticeMin->y = min.y;
+//    verticeMin->z = min.z;
+//    verticeMax->x = max.x;
+//    verticeMax->y = max.y;
+//    verticeMax->z = max.z;
+//}
 
 void desenhaEixos() //Desenha os eixos
 {
@@ -580,11 +694,6 @@ void reshape (int w, int h)
     height = h;
 
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
-    glMatrixMode (GL_PROJECTION); //set the matrix to projection
-
-    glLoadIdentity ();
-    //gluPerspective (60, (GLfloat)w / (GLfloat)h, 0.1 , 1000.0); //set the perspective (angle of sight, width, height, ,depth)
-    //glMatrixMode (GL_MODELVIEW); //set the matrix back to model
 }
 
 void keyboard (unsigned char key, int x, int y)
@@ -624,7 +733,31 @@ void keyboard (unsigned char key, int x, int y)
                 edicao = true;
             break;
         case 'p':
-            //incluir objeto ply
+            float x, y, z;
+            int id;
+            char aux;
+            printf("Lista de arquivos .ply carregados: \n");
+            printf("ID - Figura\n");
+            printf("1 - Maça\n2 - Esfera\n3 - F16\n4 - Arvore\n");
+            printf("5 - Lata de lixo\n6 - Urna\n7 - Coelho\n8 - Vaca\n");
+            printf("9 - Garça\n10 - Ketchup\n11 - Caneca\n12 - Boneco de Neve\n");
+            printf("Digite o ID do arquivo .ply a ser lido: \n");
+            std::cin >> id;
+            printf("O chão em X é de -10 a 10 e em Z é de -10 a 10: \n");
+            printf("Digite a posição em X em que o .ply deve ficar: \n");
+            std::cin >> x;
+            printf("Digite a posição em Z em que o .ply deve ficar: \n");
+            std::cin >> z;
+            printf("O objeto voa? Digite 's' ou 'n'? \n");
+            std::cin >> aux;
+            if(aux == 's'){
+                printf("Digite a posição em Y em que o .ply deve ficar: \n");
+                std::cin >> y;
+            }else
+                y = 0;
+
+            exit(0);
+            //adicionaPLY(id,x,y,z);
             break;
         case 'x':
             if(material >= 6)
@@ -753,9 +886,7 @@ void motion(int x, int y )
         }
 
         int dx = x - width/2;
-        int dy = y - height/2;
-
-        if(inverseMouse) dy = height/2-y;
+        int dy = height/2-y;
 
         if(dx) g_camera.RotateYaw(g_rotation_speed*dx);
         if(dy) g_camera.RotatePitch(g_rotation_speed*dy);
@@ -828,6 +959,28 @@ int main(int argc, char** argv)
     glutCreateWindow (argv[0]);
     showMenu();
     init ();
+
+    vetorObjetos.resize(13);
+    carregaPLY("apple.ply", 1);
+    carregaPLY("sphere.ply", 2);
+    carregaPLY("f16.ply", 3);
+    carregaPLY("fracttree.ply", 4);
+    carregaPLY("trashcan.ply", 5);
+    carregaPLY("urn2.ply", 6);
+    carregaPLY("bunny.ply", 7);
+    carregaPLY("cow.ply", 8);
+    carregaPLY("egret.ply", 9);
+    carregaPLY("ketchup.ply", 10);
+    carregaPLY("mug.ply", 11);
+    carregaPLY("snowman.ply", 12);
+
+//    carregaPLY(".ply", 13);
+//    carregaPLY(".ply", 14);
+//    carregaPLY(".ply", 15);
+//    carregaPLY(".ply", 16);
+//    carregaPLY(".ply", 17);
+//    carregaPLY(".ply", 18);
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutMouseFunc( mouse );
@@ -835,10 +988,8 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);
     glutSpecialFunc( specialKeys );
     glutIdleFunc(idle);
-
     glutKeyboardUpFunc(KeyboardUp);
     glutTimerFunc(1, Timer, 0);
-
     glutMainLoop();
     return 0;
 }

@@ -283,6 +283,8 @@ void imprimeTitulo(int objetoAtual)
 void display(void)
 {
     vertice verticeMin, verticeMax;
+    calculaBoundingBox(objetoAtual, &verticeMin, &verticeMax);
+
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Limpa o buffer de cor
 
     glViewport (0, 0, (GLsizei) width, (GLsizei) height); //Define a visualização na janela da aplicação
@@ -298,7 +300,6 @@ void display(void)
 
     setMaterials(objetoAtual);
 
-    calculaBoundingBox(objetoAtual, &verticeMin, &verticeMax);
     altura = verticeMax.y - verticeMin.y;
 
     glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
@@ -453,12 +454,12 @@ int main(int argc, char** argv)
     init ();
 
     vetorObjetos.resize(6);
-    carregaPLY("budda.ply", 0);
-    carregaPLY("bunny.ply", 1);
-    carregaPLY("cow.ply", 2);
-    carregaPLY("dragon.ply", 3);
-    carregaPLY("dragon_full.ply", 4);
-    carregaPLY("snowman.ply", 5);
+    carregaPLY("apple.ply", 0);
+    carregaPLY("sphere.ply", 1);
+    carregaPLY("f16.ply", 2);
+    carregaPLY("fracttree.ply", 3);
+    carregaPLY("trashcan.ply", 4);
+    carregaPLY("urn2.ply", 5);
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
