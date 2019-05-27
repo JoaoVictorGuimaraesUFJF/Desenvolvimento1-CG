@@ -1,16 +1,21 @@
-
 void initLight(int width, int height)
 {
    glEnable(GL_DEPTH_TEST);
    glEnable(GL_LIGHTING);                 // Habilita luz
    glEnable(GL_LIGHT0);                   // habilita luz 0
-//   glEnable(GL_LIGHT1);                   // habilita luz 1
+   glEnable(GL_LIGHT1);                   // habilita luz 0
+   glEnable(GL_LIGHT2);                   // habilita luz 0
+   glEnable(GL_LIGHT3);                   // habilita luz 0
+   glEnable(GL_NORMALIZE);
+
 
    // Cor da fonte de luz (RGBA)
-   GLfloat cor_luz[]     = { 1.0, 1.0, 1.0, 1.0};
+   GLfloat cor_luz[]     = { 0.25, 0.25, 0.25, 0.25};
    // Posicao da fonte de luz. Ultimo parametro define se a luz sera direcional (0.0) ou tera uma posicional (1.0)
-   GLfloat posicao_luz0[] = { (float) width/2, 0.1, (float) height/2, 1.0};
-//   GLfloat posicao_luz1[] = { (float) -5, 10.0, (float) -5, 1.0};
+   GLfloat posicao_luz0[] = { (float) width/2, (float) height/2, 1000.0, 1.0};
+   GLfloat posicao_luz1[] = { (float) -width/2, (float) -height/2, 1000.0, 1.0};
+   GLfloat posicao_luz2[] = { (float) width/2, (float) -height/2, 1000.0, 1.0};
+   GLfloat posicao_luz3[] = { (float) -width/2, (float) height/2, 1000.0, 1.0};
 
    // Define parametros da luz
    glLightfv(GL_LIGHT0, GL_AMBIENT, cor_luz);
@@ -18,10 +23,20 @@ void initLight(int width, int height)
    glLightfv(GL_LIGHT0, GL_SPECULAR, cor_luz);
    glLightfv(GL_LIGHT0, GL_POSITION, posicao_luz0);
 
-//   glLightfv(GL_LIGHT1, GL_AMBIENT, cor_luz);
-//   glLightfv(GL_LIGHT1, GL_DIFFUSE, cor_luz);
-//   glLightfv(GL_LIGHT1, GL_SPECULAR, cor_luz);
-//   glLightfv(GL_LIGHT1, GL_POSITION, posicao_luz1);
+   glLightfv(GL_LIGHT1, GL_AMBIENT, cor_luz);
+   glLightfv(GL_LIGHT1, GL_DIFFUSE, cor_luz);
+   glLightfv(GL_LIGHT1, GL_SPECULAR, cor_luz);
+   glLightfv(GL_LIGHT1, GL_POSITION, posicao_luz1);
+
+   glLightfv(GL_LIGHT2, GL_AMBIENT, cor_luz);
+   glLightfv(GL_LIGHT2, GL_DIFFUSE, cor_luz);
+   glLightfv(GL_LIGHT2, GL_SPECULAR, cor_luz);
+   glLightfv(GL_LIGHT2, GL_POSITION, posicao_luz2);
+
+   glLightfv(GL_LIGHT3, GL_AMBIENT, cor_luz);
+   glLightfv(GL_LIGHT3, GL_DIFFUSE, cor_luz);
+   glLightfv(GL_LIGHT3, GL_SPECULAR, cor_luz);
+   glLightfv(GL_LIGHT3, GL_POSITION, posicao_luz3);
 
     // Quando a opção "two_side lighting" está ativada, o opengl inverte a orientação das normais
     // permitindo que tanto as faces externas quanto internas sejam iluminadas.

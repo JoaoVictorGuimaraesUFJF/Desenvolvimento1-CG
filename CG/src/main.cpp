@@ -761,13 +761,29 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
         g_camera.Refresh();
 
+//        float xcam, ycam, zcam;
+//        g_camera.GetPos(xcam, ycam, zcam);
+//        for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
+//        {
+//            if(!vetorGrupos.at(i).empty())
+//            {
+//                for(int j=0; j<vetorGrupos.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+//                {
+//                    if(xcam<vetorGrupos.at(i).at(j).x0 || xcam>vetorGrupos.at(i).at(j).x1 || zcam<vetorGrupos.at(i).at(j).y0 || zcam>vetorGrupos.at(i).at(j).y1)
+//                    {
+//                        g_camera.SetPos(xcam, ycam, zcam);
+//                    }
+//                }
+//            }
+//        }
+
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
             glBegin(GL_QUADS);
-                glVertex3f(-10,0,10);
-                glVertex3f(10,0,10);
-                glVertex3f(10,0,-10);
-                glVertex3f(-10,0,-10);
+                glVertex3f(-1,0,1);
+                glVertex3f(1,0,1);
+                glVertex3f(1,0,-1);
+                glVertex3f(-1,0,-1);
             glEnd();
             glPushMatrix();
                 glRotatef( -90, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
@@ -783,8 +799,6 @@ void display(void)
             glPushMatrix();
                 glTranslatef (vetorObjetos.at(i).x, 0.0, vetorObjetos.at(i).z);
                 glRotatef(vetorObjetos.at(i).orientacao, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-                ///glScalef (-3.0, -3.0, -3.0); //arrumar tamanho "real" de cada um
-                ///arrumar posição inicial de cada um (posicionar na origem) Ex: a árvore fica metade pra baixo quando carregada diretamente
                 drawObjectPly(vetorObjetos.at(i).id); //Desenha o objeto ply
             glPopMatrix();
         }
@@ -850,26 +864,31 @@ void keyboard (unsigned char key, int x, int y)
             char aux;
             printf("Lista de arquivos .ply carregados: \n");
             printf("ID - Figura\n");
-//            printf("1 - Maça\n2 - Esfera\n3 - F16\n4 - Arvore\n");
-//            printf("5 - Lata de lixo\n6 - Urna\n7 - Coelho\n8 - Vaca\n");
-//            printf("9 - Garça\n10 - Ketchup\n11 - Caneca\n12 - Boneco de Neve\n");
             printf("1 - Maça\n2 - Arvore\n");
             printf("3 - Lata de lixo\n4 - Coelho\n5 - Vaca\n");
-            printf("6 - Garça\n");
             printf("Digite o ID do arquivo .ply a ser lido: \n");
             std::cin >> id;
-            printf("O chão em X é de -10 a 10 e em Z é de -10 a 10: \n");
+            if(id<1||id>5)
+            {
+                printf("Valor inválido!\n");
+                break;
+            }
+            printf("O chão em X é de -1 a 1 e em Z é de -1 a 1: \n");
             printf("Digite a posição em X em que o .ply deve ficar: \n");
             std::cin >> x;
+            if(x<-1||x>1)
+            {
+                printf("Valor inválido!\n");
+                break;
+            }
             printf("Digite a posição em Z em que o .ply deve ficar: \n");
             std::cin >> z;
-//            printf("O objeto voa? Digite 's' ou 'n'? \n");
-//            std::cin >> aux;
-//            if(aux == 's'){
-//                printf("Digite a posição em Y em que o .ply deve ficar: \n");
-//                std::cin >> y;
-//            }else
-                y = 0;
+            if(z<-1||z>1)
+            {
+                printf("Valor inválido!\n");
+                break;
+            }
+            y = 0;
             printf("Digite a orientação (em ângulos) do .ply: \n");
             std::cin >> orientacao;
 
@@ -1075,26 +1094,12 @@ int main(int argc, char** argv)
     glutCreateWindow (argv[0]);
     init ();
 
-    vetorPly.resize(12);
+    vetorPly.resize(5);
     carregaPLY("apple.ply", 0);
-//    carregaPLY("sphere.ply", 1);
-//    carregaPLY("f16.ply", 2);
     carregaPLY("fracttree.ply", 1);
     carregaPLY("trashcan.ply", 2);
-//    carregaPLY("urn2.ply", 5);
     carregaPLY("bunny.ply", 3);
     carregaPLY("cow.ply", 4);
-    carregaPLY("egret.ply", 5);
-//    carregaPLY("ketchup.ply", 9);
-//    carregaPLY("mug.ply", 10);
-//    carregaPLY("snowman.ply", 11);
-
-//    carregaPLY(".ply", 13);
-//    carregaPLY(".ply", 14);
-//    carregaPLY(".ply", 15);
-//    carregaPLY(".ply", 16);
-//    carregaPLY(".ply", 17);
-//    carregaPLY(".ply", 18);
 
     showMenu();
 
