@@ -70,7 +70,7 @@ float g_rotation_speed = M_PI/180*0.2;
 /// Functions
 void init(void)
 {
-    float pos[3] = {-5.0f, 0.1f, 0.0f};
+    float pos[3] = {0.0f, 0.1f, 0.0f};
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
 
@@ -78,8 +78,6 @@ void init(void)
 
 void salvarModelo(std::string outFileName)
 {
-    //std::ofstream outFile(outFileName, std::ifstream::out);
-
     std::ofstream outFile;
     outFile.open("../Modelos/" + outFileName, std::ifstream::out);
 
@@ -302,6 +300,28 @@ void carregaPLY(std::string inFileName, int id)
     inFile.close();
     std::cout << "Ply carregado com sucesso!" << std::endl;
 }
+
+//void calculaBoundingBox(int id){
+//    //min = Coordenada minima do bounding box
+//    //max = Coordenada maxima do bounding box
+//    vertice min = vetorPly.at(id).at(0).v[0];
+//    vertice max = vetorPly.at(id).at(0).v[0];
+//
+//    for (int i = 0; i < vetorPly.at(id).size(); ++i)
+//    {
+//        for(int j = 0; j < 3; j++)
+//        {
+//            if ( vetorPly.at(id).at(i).v[j].x < min.x ) min.x = vetorPly.at(id).at(i).v[j].x;
+//            if ( vetorPly.at(id).at(i).v[j].y < min.y ) min.y = vetorPly.at(id).at(i).v[j].y;
+//            if ( vetorPly.at(id).at(i).v[j].z < min.z ) min.z = vetorPly.at(id).at(i).v[j].z;
+//            if ( vetorPly.at(id).at(i).v[j].x > max.x ) max.x = vetorPly.at(id).at(i).v[j].x;
+//            if ( vetorPly.at(id).at(i).v[j].y > max.y ) max.y = vetorPly.at(id).at(i).v[j].y;
+//            if ( vetorPly.at(id).at(i).v[j].z > max.z ) max.z = vetorPly.at(id).at(i).v[j].z;
+//        }
+//    }
+//
+//    alturaPly = max.y - min.y;
+//}
 
 void adicionaPLY(int id, int material, float x, float y, float z, int orientacao){
     objeto obj;
@@ -564,6 +584,25 @@ void drawObject()
 void drawObjectPly(int id)
 {
     vertice vetorNormal;
+
+    if(id == 0){
+        glScalef(0.1,0.1,0.1);
+    }else if(id == 1){
+        glTranslatef(0.0,0.5,0.0);
+        glScalef(0.1,0.1,0.1);
+    }else if(id == 2){
+        glRotatef(-90,1.0,0.0,0.0);
+        glTranslatef(0.0,0.0,0.05);
+        glScalef(0.001,0.001,0.001);
+    }else if(id == 3){
+        glScalef(0.2,0.2,0.2);
+    }else if(id == 4){
+        glScalef(0.04,0.04,0.04);
+    }else if(id == 5){
+        glRotatef(-90,1.0,0.0,0.0);
+        glTranslatef(0.0,0.0,0.1);
+        glScalef(0.00001,0.00001,0.00001);
+    }
     glBegin(GL_TRIANGLES);
     for(int i = 0; i < vetorPly.at(id).size(); i++) // triangulos
     {
@@ -574,32 +613,6 @@ void drawObjectPly(int id)
     }
     glEnd();
 }
-
-//void calculaBoundingBox(int id, vertice *verticeMin, vertice *verticeMax)
-//{
-//    // min = Coordenada minima do bounding box
-//    // max = Coordenada maxima do bounding box
-//    vertice min = vetorPly.at(id).at(0).v[0];
-//    vertice max = vetorPly.at(id).at(0).v[0];
-//    for (int i = 0; i < vetorPly.at(id).size(); ++i)
-//    {
-//        for(int j = 0; j < 3; j++)
-//        {
-//            if ( vetorPly.at(id).at(i).v[j].x < min.x ) min.x = vetorPly.at(id).at(i).v[j].x;
-//            if ( vetorPly.at(id).at(i).v[j].y < min.y ) min.y = vetorPly.at(id).at(i).v[j].y;
-//            if ( vetorPly.at(id).at(i).v[j].z < min.z ) min.z = vetorPly.at(id).at(i).v[j].z;
-//            if ( vetorPly.at(id).at(i).v[j].x > max.x ) max.x = vetorPly.at(id).at(i).v[j].x;
-//            if ( vetorPly.at(id).at(i).v[j].y > max.y ) max.y = vetorPly.at(id).at(i).v[j].y;
-//            if ( vetorPly.at(id).at(i).v[j].z > max.z ) max.z = vetorPly.at(id).at(i).v[j].z;
-//        }
-//    }
-//    verticeMin->x = min.x;
-//    verticeMin->y = min.y;
-//    verticeMin->z = min.z;
-//    verticeMax->x = max.x;
-//    verticeMax->y = max.y;
-//    verticeMax->z = max.z;
-//}
 
 void desenhaEixos() //Desenha os eixos
 {
@@ -761,6 +774,8 @@ void display(void)
                 drawObject(); //Desenha o objeto em 3D
             glPopMatrix();
         glPopMatrix(); //Descarta a matriz no topo da pilha
+
+
 
         for(int i=0; i<vetorObjetos.size(); i++)
         {
