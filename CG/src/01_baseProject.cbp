@@ -33,6 +33,8 @@
 			<Add library="z" />
 			<Add library="GLEW" />
 		</Linker>
+		<Unit filename="camera.cpp" />
+		<Unit filename="camera.h" />
 		<Unit filename="extras.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>

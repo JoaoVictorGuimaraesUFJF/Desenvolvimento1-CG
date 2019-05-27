@@ -1,35 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="camera.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1021" topLine="27" />
+			<Cursor1 position="0" topLine="75" />
 		</Cursor>
-		<Folding>
-			<Collapse line="18" />
-			<Collapse line="24" />
-			<Collapse line="50" />
-			<Collapse line="55" />
-			<Collapse line="99" />
-			<Collapse line="110" />
-			<Collapse line="165" />
-			<Collapse line="196" />
-			<Collapse line="215" />
-			<Collapse line="231" />
-			<Collapse line="397" />
-			<Collapse line="414" />
-			<Collapse line="428" />
-			<Collapse line="447" />
-			<Collapse line="465" />
-			<Collapse line="473" />
-			<Collapse line="566" />
-			<Collapse line="584" />
-		</Folding>
 	</File>
 	<File name="extras.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1796" topLine="0" />
+			<Cursor1 position="881" topLine="4" />
+		</Cursor>
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="4126" topLine="137" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

@@ -54,7 +54,7 @@
 1555444742 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
 	"glcFPSViewer.h"
 
-1558642606 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
+1558953888 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -67,13 +67,14 @@
 	<fstream>
 	<string>
 	<sstream>
+	"camera.h"
 	"extras.h"
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
 1558814225 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
 
-1558632294 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
+1558934967 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 
 1557785598 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main-D2.cpp
 	<GL/glut.h>
@@ -112,4 +113,12 @@
 	"camera.h"
 
 1558799707 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/camera.h
+
+1558910839 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/camera.cpp
+	<stdio.h>
+	<math.h>
+	<GL/glut.h>
+	"camera.h"
+
+1558910839 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/camera.h
 

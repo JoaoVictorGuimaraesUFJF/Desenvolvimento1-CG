@@ -28,6 +28,13 @@ public:
     vertice v[3];
 };
 
+class objeto
+{
+public:
+    int id, material, orientacao;
+    float x,y,z;
+};
+
 /// Globals
 float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
@@ -39,15 +46,20 @@ bool fullScreen = false;
 bool releaseMouse = false;
 bool edicao = true;
 std::string nomeArquivo;
-std::vector< std::vector<triangle> > triangulos; //vetor para armazenar triângulos
-std::vector<int> vetorMateriais;
-std::vector< std::vector<vertice> > vetorVertice; //Estrutura utilizada para armazenar os vértices
+
+//Estrutura Grupos
+std::vector< std::vector<triangle> > triangulosGrupos; //vetor para armazenar triângulos
+std::vector<int> materiaisGrupos;
+std::vector< std::vector<vertice> > vetorGrupos; //Estrutura utilizada para armazenar os vértices
 
 //Ler .ply
-int tamanhoVetorVertices = 0;
-int tamanhoVetorObjeto = 0;
-std::vector< vertice > vetorVertices; //Estrutura utilizada para armazenar os vértices
-std::vector< std::vector<triangle> > vetorObjetos; //Estrutura utilizada para armazenar os objetos
+int quantVerticesPly = 0;
+int quantFacesPly = 0;
+std::vector< vertice > verticesPly; //Estrutura utilizada para armazenar os vértices
+std::vector< std::vector<triangle> > vetorPly; //Estrutura utilizada para armazenar os objetos Ply disponiveis
+
+//Desenhar Ply
+std::vector< objeto > vetorObjetos; //Estrutura utilizada para armazenar os objetos Ply disponiveis
 
 //Camera
 Camera g_camera;
@@ -58,7 +70,7 @@ float g_rotation_speed = M_PI/180*0.2;
 /// Functions
 void init(void)
 {
-    float pos[3] = {0.0f, 0.1f, -0.1f};
+    float pos[3] = {-5.0f, 0.1f, 0.0f};
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
 
@@ -77,32 +89,50 @@ void salvarModelo(std::string outFileName)
     }
     else
     {
-        int quantidadeGrupos=0;
+        int quantGrupos=0;
 
-        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+        for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
         {
-            if(!vetorVertice.at(i).empty())
+            if(!vetorGrupos.at(i).empty())
             {
-                quantidadeGrupos++;
+                quantGrupos++;
             }
         }
+        outFile << quantGrupos << std::endl;
 
-        outFile << quantidadeGrupos << std::endl;
+        outFile << vetorObjetos.size() << std::endl;
 
-        for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+        for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
         {
-            if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+            if(!vetorGrupos.at(i).empty())
             {
-                for(int j=0; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+                outFile << materiaisGrupos.at(i) << ";";
+            }
+        }
+        outFile << std::endl;
+
+        for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
+        {
+            if(!vetorGrupos.at(i).empty())
+            {
+                for(int j=0; j<vetorGrupos.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
                 {
-                    outFile << vetorVertice.at(i).at(j).x << ";" << vetorVertice.at(i).at(j).y << ";" << vetorVertice.at(i).at(j).z << ";";
-                    outFile << vetorVertice.at(i).at(j).x0 << ";" << vetorVertice.at(i).at(j).x1 << ";" << vetorVertice.at(i).at(j).y0 << ";" << vetorVertice.at(i).at(j).y1 << ";";
+                    outFile << vetorGrupos.at(i).at(j).x << ";" << vetorGrupos.at(i).at(j).y << ";" << vetorGrupos.at(i).at(j).z << ";";
+                    outFile << vetorGrupos.at(i).at(j).x0 << ";" << vetorGrupos.at(i).at(j).x1 << ";" << vetorGrupos.at(i).at(j).y0 << ";" << vetorGrupos.at(i).at(j).y1 << ";";
                     outFile << std::endl;
 
                 }
                 outFile << std::endl;
             }
         }
+
+        for(int i=0; i<vetorObjetos.size(); i++) //percorre os objetos
+        {
+            outFile << vetorObjetos.at(i).id << ";" << vetorObjetos.at(i).material << ";" << vetorObjetos.at(i).orientacao << ";";
+            outFile << vetorObjetos.at(i).x << ";" << vetorObjetos.at(i).y << ";" << vetorObjetos.at(i).z << ";";
+            outFile << std::endl;
+        }
+
         outFile.close();
         std::cout << "Arquivo salvo com sucesso na pasta Modelos!" << std::endl;
     }
@@ -129,16 +159,30 @@ void carregarModelo(std::string inFileName)
     }
     else
     {
-        vetorVertice.clear();
+        vetorGrupos.clear();
+        materiaisGrupos.clear();
+        vetorObjetos.clear();
         std::string line;
         std::vector<std::string> data;
-        int quantidadeGrupos=0, grupoAtual=0;
+        int quantGrupos=0, grupoAtual=0, quantObjetos=0;
         std::getline(inFile, line);
-        quantidadeGrupos = std::stoi(line);
-        grupo=quantidadeGrupos+1;
-        vetorVertice.resize(quantidadeGrupos);
-        while (std::getline(inFile, line) && grupoAtual<quantidadeGrupos)
+        quantGrupos = std::stoi(line);
+        std::getline(inFile, line);
+        quantObjetos = std::stoi(line);
+        grupo=quantGrupos+1;
+        vetorGrupos.resize(quantGrupos);
+        triangulosGrupos.resize(quantGrupos);
+
+        std::getline(inFile, line);
+        data = explode(line, ';');
+        for(int i=0;i<quantGrupos;i++)
         {
+            materiaisGrupos.push_back(std::stoi(data[i]));
+        }
+
+        while (grupoAtual<quantGrupos)
+        {
+            std::getline(inFile, line);
             if(!line.empty())
             {
                 data = explode(line, ';');
@@ -150,13 +194,33 @@ void carregarModelo(std::string inFileName)
                 v.x1 = std::stof (data[4]);
                 v.y0 = std::stof (data[5]);
                 v.y1 = std::stof (data[6]);
-                vetorVertice.at(grupoAtual).push_back(v);
+                vetorGrupos.at(grupoAtual).push_back(v);
             }
             else
             {
                 grupoAtual++;
             }
         }
+
+        int i=0;
+        while (i<quantObjetos)
+        {
+            std::getline(inFile, line);
+            if(!line.empty())
+            {
+                data = explode(line, ';');
+                objeto obj;
+                obj.id = std::stoi (data[0]);
+                obj.material = std::stoi (data[1]);
+                obj.orientacao = std::stoi (data[2]);
+                obj.x = std::stof (data[3]);
+                obj.y = std::stof (data[4]);
+                obj.z = std::stof (data[5]);
+                vetorObjetos.push_back(obj);
+                i++;
+            }
+        }
+
         inFile.close();
         std::cout << "Modelo carregado com sucesso!" << std::endl;
     }
@@ -172,7 +236,7 @@ void carregaPLY(std::string inFileName, int id)
     }
     else
     {
-        vetorVertices.clear();
+        verticesPly.clear();
         std::string line;
         std::vector<std::string> data;
 
@@ -185,19 +249,19 @@ void carregaPLY(std::string inFileName, int id)
                 {
                     if (data[1] == "vertex")
                     {
-                        tamanhoVetorVertices = std::stoi(data[2]);
+                        quantVerticesPly = std::stoi(data[2]);
 
                     }
                     else if (data[1] == "face")
                     {
-                        tamanhoVetorObjeto = std::stoi(data[2]);
+                        quantFacesPly = std::stoi(data[2]);
                     }
                 }
             }
         }
 
 
-        for(int i = 0; i < tamanhoVetorVertices; i++)
+        for(int i = 0; i < quantVerticesPly; i++)
         {
             std::getline(inFile, line);
             data = explode(line, ' ');
@@ -205,32 +269,32 @@ void carregaPLY(std::string inFileName, int id)
             v.x = std::stof (data[0]);
             v.y = std::stof (data[1]);
             v.z = std::stof (data[2]);
-            vetorVertices.push_back(v);
+            verticesPly.push_back(v);
         }
 
-        for(int i = 0; i < tamanhoVetorObjeto; i++)
+        for(int i = 0; i < quantFacesPly; i++)
         {
             std::getline(inFile, line);
             data = explode(line, ' ');
             triangle tri;
             if(data[0] == "3")
             {
-                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
-                tri.v[1] = vetorVertices.at(std::stoi(data[2]));
-                tri.v[2] = vetorVertices.at(std::stoi(data[3]));
-                vetorObjetos.at(id).push_back(tri);
+                tri.v[0] = verticesPly.at(std::stoi(data[1]));
+                tri.v[1] = verticesPly.at(std::stoi(data[2]));
+                tri.v[2] = verticesPly.at(std::stoi(data[3]));
+                vetorPly.at(id).push_back(tri);
             }
             else if (data[0] == "4")
             {
-                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
-                tri.v[1] = vetorVertices.at(std::stoi(data[2]));
-                tri.v[2] = vetorVertices.at(std::stoi(data[3]));
-                vetorObjetos.at(id).push_back(tri);
+                tri.v[0] = verticesPly.at(std::stoi(data[1]));
+                tri.v[1] = verticesPly.at(std::stoi(data[2]));
+                tri.v[2] = verticesPly.at(std::stoi(data[3]));
+                vetorPly.at(id).push_back(tri);
 
-                tri.v[0] = vetorVertices.at(std::stoi(data[1]));
-                tri.v[1] = vetorVertices.at(std::stoi(data[3]));
-                tri.v[2] = vetorVertices.at(std::stoi(data[4]));
-                vetorObjetos.at(id).push_back(tri);
+                tri.v[0] = verticesPly.at(std::stoi(data[1]));
+                tri.v[1] = verticesPly.at(std::stoi(data[3]));
+                tri.v[2] = verticesPly.at(std::stoi(data[4]));
+                vetorPly.at(id).push_back(tri);
             }
         }
 
@@ -239,9 +303,16 @@ void carregaPLY(std::string inFileName, int id)
     std::cout << "Ply carregado com sucesso!" << std::endl;
 }
 
-void adicionaPLY(int id, float x, float y, float z){
-
-    ///ADICIONA O .PLY NO AMBIENTE NA POSIÇÃO X, Y, Z PASSADA POR PARAMETRO PELO USUARIO
+void adicionaPLY(int id, int material, float x, float y, float z, int orientacao){
+    objeto obj;
+    obj.id = id;
+    obj.material = material;
+    obj.x = x;
+    obj.y = y;
+    obj.z = z;
+    obj.orientacao = orientacao;
+    vetorObjetos.push_back(obj);
+    std::cout << "Ply posicionado!" << std::endl;
 }
 
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
@@ -327,185 +398,199 @@ void showMenu()
 void drawObject()
 {
     vertice vetorNormal;
-    for(int i=0; i<vetorVertice.size(); i++) //percorre os grupos
+    for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
     {
-        if(!vetorVertice.at(i).empty() && vetorVertice.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        if(!vetorGrupos.at(i).empty() && vetorGrupos.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
         {
-            for(int j=1; j<vetorVertice.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
+            for(int j=1; j<vetorGrupos.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulosGrupos(uma face)
             {
                 triangle tri;
 
-                tri.v[0].x=vetorVertice.at(i).at(j).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j).y0;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
-                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[2].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[2].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y0;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
+                tri.v[1].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[2].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[2].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///1
-                tri.v[0].x=vetorVertice.at(i).at(j).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j).y0;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y0;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x0;
-                tri.v[2].y=vetorVertice.at(i).at(j).y0;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y0;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///2
-                tri.v[0].x=vetorVertice.at(i).at(j).x1;
-                tri.v[0].y=vetorVertice.at(i).at(j).y1;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y1;
-                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y1;
+                tri.v[1].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[2].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j-1).y1;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///3
-                tri.v[0].x=vetorVertice.at(i).at(j).x1;
-                tri.v[0].y=vetorVertice.at(i).at(j).y1;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y1;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///4
 
-                tri.v[0].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j-1).y0;
-                tri.v[0].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j-1).y0;
+                tri.v[0].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
-                tri.v[2].z=vetorVertice.at(i).at(j-1).z;
-                triangulos.at(i).push_back(tri);
+                tri.v[2].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j-1).y1;
+                tri.v[2].z=vetorGrupos.at(i).at(j-1).z;
+                triangulosGrupos.at(i).push_back(tri);
                 ///5
-                tri.v[0].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[0].z=0;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y1;
-                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[2].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y1;
+                tri.v[1].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[2].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j-1).y1;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///6
-                tri.v[0].x=vetorVertice.at(i).at(j).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j).y0;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y0;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
-                tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.at(i).push_back(tri);
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[2].z=vetorGrupos.at(i).at(j).z;
+                triangulosGrupos.at(i).push_back(tri);
                 ///7
-                tri.v[0].x=vetorVertice.at(i).at(j).x1;
-                tri.v[0].y=vetorVertice.at(i).at(j).y1;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y1;
                 tri.v[0].z=0;
-                tri.v[1].x=vetorVertice.at(i).at(j).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j).y0;
+                tri.v[1].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
-                tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.at(i).push_back(tri);
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[2].z=vetorGrupos.at(i).at(j).z;
+                triangulosGrupos.at(i).push_back(tri);
                 ///8
-                tri.v[0].x=vetorVertice.at(i).at(j).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j).y0;
+                tri.v[0].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y0;
                 tri.v[0].z=0;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///9
-                tri.v[0].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[0].y=vetorVertice.at(i).at(j-1).y1;
+                tri.v[0].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[0].y=vetorGrupos.at(i).at(j-1).y1;
                 tri.v[0].z=0;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
                 tri.v[1].z=0;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
                 tri.v[2].z=0;
-                triangulos.at(i).push_back(tri);
+                triangulosGrupos.at(i).push_back(tri);
                 ///10
-                tri.v[0].x=vetorVertice.at(i).at(j).x0;
-                tri.v[0].y=vetorVertice.at(i).at(j).y0;
-                tri.v[0].z=vetorVertice.at(i).at(j).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
-                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
-                tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.at(i).push_back(tri);
+                tri.v[0].x=vetorGrupos.at(i).at(j).x0;
+                tri.v[0].y=vetorGrupos.at(i).at(j).y0;
+                tri.v[0].z=vetorGrupos.at(i).at(j).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
+                tri.v[1].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[2].z=vetorGrupos.at(i).at(j).z;
+                triangulosGrupos.at(i).push_back(tri);
                 ///11
-                tri.v[0].x=vetorVertice.at(i).at(j-1).x1;
-                tri.v[0].y=vetorVertice.at(i).at(j-1).y1;
-                tri.v[0].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[1].x=vetorVertice.at(i).at(j-1).x0;
-                tri.v[1].y=vetorVertice.at(i).at(j-1).y0;
-                tri.v[1].z=vetorVertice.at(i).at(j-1).z;
-                tri.v[2].x=vetorVertice.at(i).at(j).x1;
-                tri.v[2].y=vetorVertice.at(i).at(j).y1;
-                tri.v[2].z=vetorVertice.at(i).at(j).z;
-                triangulos.at(i).push_back(tri);
+                tri.v[0].x=vetorGrupos.at(i).at(j-1).x1;
+                tri.v[0].y=vetorGrupos.at(i).at(j-1).y1;
+                tri.v[0].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[1].x=vetorGrupos.at(i).at(j-1).x0;
+                tri.v[1].y=vetorGrupos.at(i).at(j-1).y0;
+                tri.v[1].z=vetorGrupos.at(i).at(j-1).z;
+                tri.v[2].x=vetorGrupos.at(i).at(j).x1;
+                tri.v[2].y=vetorGrupos.at(i).at(j).y1;
+                tri.v[2].z=vetorGrupos.at(i).at(j).z;
+                triangulosGrupos.at(i).push_back(tri);
                 ///12
             }
         }
     }
-    for(int i=0; i < triangulos.size(); i++)
+    for(int i=0; i < triangulosGrupos.size(); i++)
     {
-        if(!triangulos.at(i).empty() && triangulos.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
+        if(!triangulosGrupos.at(i).empty() && triangulosGrupos.at(i).size()>1)//verifica se há mais de 1 ponto para desenhar as faces
         {
-            setMaterials(vetorMateriais.at(i));
+            setMaterials(materiaisGrupos.at(i));
             glBegin(GL_TRIANGLES);
-            for(int j = 0; j < triangulos.at(i).size(); j++) // triangulos
+            for(int j = 0; j < triangulosGrupos.at(i).size(); j++) // triangulosGrupos
             {
-                CalculaNormal(triangulos.at(i).at(j), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+                CalculaNormal(triangulosGrupos.at(i).at(j), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
                 glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
                 for(int k = 0; k < 3; k++) // vertices do triangulo
-                    glVertex3d(triangulos.at(i).at(j).v[k].x,triangulos.at(i).at(j).v[k].y, triangulos.at(i).at(j).v[k].z);
+                    glVertex3d(triangulosGrupos.at(i).at(j).v[k].x,triangulosGrupos.at(i).at(j).v[k].y, triangulosGrupos.at(i).at(j).v[k].z);
             }
             glEnd();
         }
-        triangulos.at(i).clear();
+        triangulosGrupos.at(i).clear();
     }
 }
 
-//void calculaBoundingBox(int numObjeto, vertice *verticeMin, vertice *verticeMax)
+void drawObjectPly(int id)
+{
+    vertice vetorNormal;
+    glBegin(GL_TRIANGLES);
+    for(int i = 0; i < vetorPly.at(id).size(); i++) // triangulos
+    {
+        CalculaNormal(vetorPly.at(id).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
+        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
+        for(int j = 0; j < 3; j++) // vertices do triangulo
+            glVertex3d(vetorPly.at(id).at(i).v[j].x,vetorPly.at(id).at(i).v[j].y, vetorPly.at(id).at(i).v[j].z);
+    }
+    glEnd();
+}
+
+//void calculaBoundingBox(int id, vertice *verticeMin, vertice *verticeMax)
 //{
 //    // min = Coordenada minima do bounding box
 //    // max = Coordenada maxima do bounding box
-//    vertice min = vetorObjetos.at(numObjeto).at(0).v[0];
-//    vertice max = vetorObjetos.at(numObjeto).at(0).v[0];
-//    for (int i = 0; i < vetorObjetos.at(numObjeto).size(); ++i)
+//    vertice min = vetorPly.at(id).at(0).v[0];
+//    vertice max = vetorPly.at(id).at(0).v[0];
+//    for (int i = 0; i < vetorPly.at(id).size(); ++i)
 //    {
 //        for(int j = 0; j < 3; j++)
 //        {
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].x < min.x ) min.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].y < min.y ) min.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].z < min.z ) min.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].x > max.x ) max.x = vetorObjetos.at(numObjeto).at(i).v[j].x;
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].y > max.y ) max.y = vetorObjetos.at(numObjeto).at(i).v[j].y;
-//            if ( vetorObjetos.at(numObjeto).at(i).v[j].z > max.z ) max.z = vetorObjetos.at(numObjeto).at(i).v[j].z;
+//            if ( vetorPly.at(id).at(i).v[j].x < min.x ) min.x = vetorPly.at(id).at(i).v[j].x;
+//            if ( vetorPly.at(id).at(i).v[j].y < min.y ) min.y = vetorPly.at(id).at(i).v[j].y;
+//            if ( vetorPly.at(id).at(i).v[j].z < min.z ) min.z = vetorPly.at(id).at(i).v[j].z;
+//            if ( vetorPly.at(id).at(i).v[j].x > max.x ) max.x = vetorPly.at(id).at(i).v[j].x;
+//            if ( vetorPly.at(id).at(i).v[j].y > max.y ) max.y = vetorPly.at(id).at(i).v[j].y;
+//            if ( vetorPly.at(id).at(i).v[j].z > max.z ) max.z = vetorPly.at(id).at(i).v[j].z;
 //        }
 //    }
 //    verticeMin->x = min.x;
@@ -568,16 +653,16 @@ void desenhaPontosOrtogonais(vertice v) //Função auxiliar de desenho
 
 void desenhaPontos() //Desenha os pontos
 {
-    for(int i=0; i<vetorVertice.size(); i++)
+    for(int i=0; i<vetorGrupos.size(); i++)
     {
-        if(!vetorVertice.at(i).empty())
+        if(!vetorGrupos.at(i).empty())
         {
-            for(int j=0; j<vetorVertice.at(i).size(); j++)
+            for(int j=0; j<vetorGrupos.at(i).size(); j++)
             {
-                desenhaPonto2D(vetorVertice.at(i).at(j)); //Desenha o ponto em 2D
-                if(vetorVertice.at(i).size()!=1)
+                desenhaPonto2D(vetorGrupos.at(i).at(j)); //Desenha o ponto em 2D
+                if(vetorGrupos.at(i).size()!=1)
                 {
-                    desenhaPontosOrtogonais(vetorVertice.at(i).at(j)); //Desenha os pontos ortogonais
+                    desenhaPontosOrtogonais(vetorGrupos.at(i).at(j)); //Desenha os pontos ortogonais
                 }
             }
         }
@@ -586,9 +671,9 @@ void desenhaPontos() //Desenha os pontos
 
 void excluirPonto(int grupo) //Apaga os pontos
 {
-    if(!vetorVertice.at(grupo-1).empty())
+    if(!vetorGrupos.at(grupo-1).empty())
     {
-        vetorVertice.at(grupo-1).pop_back(); // Remove o ultimo elemento do vetor
+        vetorGrupos.at(grupo-1).pop_back(); // Remove o ultimo elemento do vetor
     }
 }
 
@@ -677,6 +762,18 @@ void display(void)
             glPopMatrix();
         glPopMatrix(); //Descarta a matriz no topo da pilha
 
+        for(int i=0; i<vetorObjetos.size(); i++)
+        {
+            setMaterials(vetorObjetos.at(i).material);
+            glPushMatrix();
+                glTranslatef (vetorObjetos.at(i).x, 0.0, vetorObjetos.at(i).z);
+                glRotatef(vetorObjetos.at(i).orientacao, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
+                ///glScalef (-3.0, -3.0, -3.0); //arrumar tamanho "real" de cada um
+                ///arrumar posição inicial de cada um (posicionar na origem) Ex: a árvore fica metade pra baixo quando carregada diretamente
+                drawObjectPly(vetorObjetos.at(i).id); //Desenha o objeto ply
+            glPopMatrix();
+        }
+
         glutSwapBuffers(); //Troca os buffers
 
         glutSetWindowTitle("T2 - Ambiente Virtual - Press ESC to exit.");
@@ -734,13 +831,16 @@ void keyboard (unsigned char key, int x, int y)
             break;
         case 'p':
             float x, y, z;
-            int id;
+            int id, orientacao;
             char aux;
             printf("Lista de arquivos .ply carregados: \n");
             printf("ID - Figura\n");
-            printf("1 - Maça\n2 - Esfera\n3 - F16\n4 - Arvore\n");
-            printf("5 - Lata de lixo\n6 - Urna\n7 - Coelho\n8 - Vaca\n");
-            printf("9 - Garça\n10 - Ketchup\n11 - Caneca\n12 - Boneco de Neve\n");
+//            printf("1 - Maça\n2 - Esfera\n3 - F16\n4 - Arvore\n");
+//            printf("5 - Lata de lixo\n6 - Urna\n7 - Coelho\n8 - Vaca\n");
+//            printf("9 - Garça\n10 - Ketchup\n11 - Caneca\n12 - Boneco de Neve\n");
+            printf("1 - Maça\n2 - Arvore\n");
+            printf("3 - Lata de lixo\n4 - Coelho\n5 - Vaca\n");
+            printf("6 - Garça\n");
             printf("Digite o ID do arquivo .ply a ser lido: \n");
             std::cin >> id;
             printf("O chão em X é de -10 a 10 e em Z é de -10 a 10: \n");
@@ -748,16 +848,17 @@ void keyboard (unsigned char key, int x, int y)
             std::cin >> x;
             printf("Digite a posição em Z em que o .ply deve ficar: \n");
             std::cin >> z;
-            printf("O objeto voa? Digite 's' ou 'n'? \n");
-            std::cin >> aux;
-            if(aux == 's'){
-                printf("Digite a posição em Y em que o .ply deve ficar: \n");
-                std::cin >> y;
-            }else
+//            printf("O objeto voa? Digite 's' ou 'n'? \n");
+//            std::cin >> aux;
+//            if(aux == 's'){
+//                printf("Digite a posição em Y em que o .ply deve ficar: \n");
+//                std::cin >> y;
+//            }else
                 y = 0;
+            printf("Digite a orientação (em ângulos) do .ply: \n");
+            std::cin >> orientacao;
 
-            exit(0);
-            //adicionaPLY(id,x,y,z);
+            adicionaPLY(id-1,material,x,y,z,orientacao);
             break;
         case 'x':
             if(material >= 6)
@@ -908,29 +1009,29 @@ void mouse(int button, int state, int x, int y)
             v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
             v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
             v.z = (float) altura/5;
-            if(vetorVertice.size() < grupo)
+            if(vetorGrupos.size() < grupo)
             {
-                vetorVertice.resize(grupo);
-                vetorMateriais.resize(grupo);
-                triangulos.resize(grupo);
+                vetorGrupos.resize(grupo);
+                materiaisGrupos.resize(grupo);
+                triangulosGrupos.resize(grupo);
             }
-            vetorMateriais.at(grupo - 1) = material;
-            if(!vetorVertice.at(grupo - 1).empty())
+            materiaisGrupos.at(grupo - 1) = material;
+            if(!vetorGrupos.at(grupo - 1).empty())
             {
-                CalculaOrtogonal(v, vetorVertice.at(grupo-1).back(), &vetorOrtogonal);
+                CalculaOrtogonal(v, vetorGrupos.at(grupo-1).back(), &vetorOrtogonal);
                 v.x0 = v.x + vetorOrtogonal.x*(-espessura)/10;
                 v.y0 = v.y + vetorOrtogonal.y*(-espessura)/10;
                 v.x1 = v.x + vetorOrtogonal.x*espessura/10;
                 v.y1 = v.y + vetorOrtogonal.y*espessura/10;
-                if(vetorVertice.at(grupo-1).size()==1)
+                if(vetorGrupos.at(grupo-1).size()==1)
                 {
-                    vetorVertice.at(grupo-1).front().x0=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*(-espessura)/10;
-                    vetorVertice.at(grupo-1).front().y0=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*(-espessura)/10;
-                    vetorVertice.at(grupo-1).front().x1=vetorVertice.at(grupo-1).front().x + vetorOrtogonal.x*espessura/10;
-                    vetorVertice.at(grupo-1).front().y1=vetorVertice.at(grupo-1).front().y + vetorOrtogonal.y*espessura/10;
+                    vetorGrupos.at(grupo-1).front().x0=vetorGrupos.at(grupo-1).front().x + vetorOrtogonal.x*(-espessura)/10;
+                    vetorGrupos.at(grupo-1).front().y0=vetorGrupos.at(grupo-1).front().y + vetorOrtogonal.y*(-espessura)/10;
+                    vetorGrupos.at(grupo-1).front().x1=vetorGrupos.at(grupo-1).front().x + vetorOrtogonal.x*espessura/10;
+                    vetorGrupos.at(grupo-1).front().y1=vetorGrupos.at(grupo-1).front().y + vetorOrtogonal.y*espessura/10;
                 }
             }
-            vetorVertice.at(grupo-1).push_back(v);
+            vetorGrupos.at(grupo-1).push_back(v);
         }
         last_x = x;
         last_y = y;
@@ -957,22 +1058,21 @@ int main(int argc, char** argv)
     glutInitWindowSize (800, 400);
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
-    showMenu();
     init ();
 
-    vetorObjetos.resize(13);
-    carregaPLY("apple.ply", 1);
-    carregaPLY("sphere.ply", 2);
-    carregaPLY("f16.ply", 3);
-    carregaPLY("fracttree.ply", 4);
-    carregaPLY("trashcan.ply", 5);
-    carregaPLY("urn2.ply", 6);
-    carregaPLY("bunny.ply", 7);
-    carregaPLY("cow.ply", 8);
-    carregaPLY("egret.ply", 9);
-    carregaPLY("ketchup.ply", 10);
-    carregaPLY("mug.ply", 11);
-    carregaPLY("snowman.ply", 12);
+    vetorPly.resize(12);
+    carregaPLY("apple.ply", 0);
+//    carregaPLY("sphere.ply", 1);
+//    carregaPLY("f16.ply", 2);
+    carregaPLY("fracttree.ply", 1);
+    carregaPLY("trashcan.ply", 2);
+//    carregaPLY("urn2.ply", 5);
+    carregaPLY("bunny.ply", 3);
+    carregaPLY("cow.ply", 4);
+    carregaPLY("egret.ply", 5);
+//    carregaPLY("ketchup.ply", 9);
+//    carregaPLY("mug.ply", 10);
+//    carregaPLY("snowman.ply", 11);
 
 //    carregaPLY(".ply", 13);
 //    carregaPLY(".ply", 14);
@@ -980,6 +1080,8 @@ int main(int argc, char** argv)
 //    carregaPLY(".ply", 16);
 //    carregaPLY(".ply", 17);
 //    carregaPLY(".ply", 18);
+
+    showMenu();
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
