@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1558980243 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1561472070 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -33,6 +33,7 @@
 	<sstream>
 	"camera.h"
 	"extras.h"
+	"glcTexture.h"
 
 1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
 
@@ -72,7 +73,7 @@
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
-1558980067 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
+1559061866 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras.h
 
 1558995755 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras.h
 
@@ -121,4 +122,15 @@
 	"camera.h"
 
 1558910839 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/camera.h
+
+1561472213 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcTexture.cpp
+	<string>
+	<stdio.h>
+	<malloc.h>
+	"GL/glut.h"
+	"png.h"
+	"glcTexture.h"
+
+1557232835 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcTexture.h
+	<string>
 

@@ -13,6 +13,7 @@
 
 #include "camera.h"
 #include "extras.h"
+#include "glcTexture.h"
 
 /// Estruturas iniciais para armazenar vertices
 //  Você poderá utilizá-las adicionando novos métodos (de acesso por exemplo) ou usar suas próprias estruturas.
@@ -34,6 +35,10 @@ public:
     int id, material, orientacao;
     float x,y,z;
 };
+
+// Aqui é criada a referência ao objeto que gerenciará as texturas
+glcTexture *textureManager;
+int selected = 0;
 
 /// Globals
 float zdist = 5.0;
@@ -67,13 +72,58 @@ bool g_key[256];
 float g_translation_speed = 0.005;
 float g_rotation_speed = M_PI/180*0.2;
 
+//Cilindro
+vertice v[37];
+
+void criaTriangulo(){
+    float PI = 3.1415927;
+    float raio = 1.0;
+
+    for(int k=0, g=0.0f; g<360; g+=10, k++ ){
+        v[k].x = raio * cos(g * PI / 180);
+        v[k].y = raio * sin(g * PI / 180);
+    }
+
+    v[36] = v[0];
+}
+
+void calculaNormalVertice(float x, float y, float z){
+    float a = sqrt( pow(x,2) + pow(y,2) );
+    glNormal3f(-x/a,-y/a,0);
+}
+
+void desenhaPonto3D(float x, float y, float z){
+    calculaNormalVertice(x,y,z);
+    glVertex3f(x,y,z);
+}
+
+void desenhaCilindro(){
+    float h = 2;
+    glBegin(GL_QUAD_STRIP);
+    for(int k = 0 ; k < 36 ; k++){
+        desenhaPonto3D(v[k].x,v[k].y,0);
+        desenhaPonto3D(v[k+1].x,v[k+1].y,0);
+
+        desenhaPonto3D(v[k].x,v[k].y, h);
+        desenhaPonto3D(v[k+1].x,v[k+1].y, h);
+    }
+    glEnd();
+}
+
 /// Functions
 void init(void)
 {
+    glShadeModel (GL_SMOOTH);
+
     float pos[3] = {0.0f, 0.1f, 0.0f};
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
 
+    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
+    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
+    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
+
+	criaTriangulo();
 }
 
 void salvarModelo(std::string outFileName)
@@ -761,21 +811,9 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
         g_camera.Refresh();
 
-//        float xcam, ycam, zcam;
-//        g_camera.GetPos(xcam, ycam, zcam);
-//        for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
-//        {
-//            if(!vetorGrupos.at(i).empty())
-//            {
-//                for(int j=0; j<vetorGrupos.at(i).size(); j++) //percorre a partir do segundo vertice e cria dois triangulos(uma face)
-//                {
-//                    if(xcam<vetorGrupos.at(i).at(j).x0 || xcam>vetorGrupos.at(i).at(j).x1 || zcam<vetorGrupos.at(i).at(j).y0 || zcam>vetorGrupos.at(i).at(j).y1)
-//                    {
-//                        g_camera.SetPos(xcam, ycam, zcam);
-//                    }
-//                }
-//            }
-//        }
+        // Seleciona a textura corrente
+        textureManager->Bind(selected);
+        float aspectRatio = textureManager->GetAspectRatio(selected);
 
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
@@ -788,6 +826,7 @@ void display(void)
             glPushMatrix();
                 glRotatef( -90, 1.0, 0.0, 0.0 ); //Rotaciona o objeto em 3D
                 drawObject(); //Desenha o objeto em 3D
+                desenhaCilindro();
             glPopMatrix();
         glPopMatrix(); //Descarta a matriz no topo da pilha
 
@@ -805,8 +844,10 @@ void display(void)
 
         glutSwapBuffers(); //Troca os buffers
 
-        glutSetWindowTitle("T2 - Ambiente Virtual - Press ESC to exit.");
+        glutSetWindowTitle("T3 - Ambiente Virtual - Press ESC to exit.");
     }
+    // Desabilita o uso de texturas
+    textureManager->Disable();
 }
 
 void idle ()
