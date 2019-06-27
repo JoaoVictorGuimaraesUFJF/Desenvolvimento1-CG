@@ -43,9 +43,11 @@ int selected = 0;
 /// Globals
 float zdist = 5.0;
 float rotationX = 0.0, rotationY = 0.0;
+float alturaUsuario = 0.2;
 int   last_x, last_y;
 int   width, height;
-int altura = 1, grupo = 1, espessura = 1, material = 1; //Variaveis
+float altura = 0;
+int grupo = 1, espessura = 1, material = 1; //Variaveis
 vertice vetorOrtogonal;
 bool fullScreen = false;
 bool releaseMouse = false;
@@ -98,7 +100,7 @@ void desenhaPonto3D(float x, float y, float z){
 }
 
 void desenhaCilindro(){
-    float h = 2;
+    float h = 6*alturaUsuario;
     glBegin(GL_QUAD_STRIP);
     for(int k = 0 ; k < 36 ; k++){
         desenhaPonto3D(v[k].x,v[k].y,0);
@@ -110,18 +112,30 @@ void desenhaCilindro(){
     glEnd();
 }
 
+void desenhaCirculo(){
+    glDisable(GL_LIGHTING);
+    glPointSize(10.0); //Define o tamanho do ponto
+    glColor3f(0.0f, 1.0f, 0.0f); //Define cor do ponto
+    glBegin(GL_POINTS);
+    for(int k = 0 ; k < 36 ; k++){
+        glVertex2f(v[k].x,v[k].y);
+    }
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 /// Functions
 void init(void)
 {
     glShadeModel (GL_SMOOTH);
 
-    float pos[3] = {0.0f, 0.1f, 0.0f};
+    float pos[3] = {0.9f, alturaUsuario, 0.0f};
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
-
-    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
-    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
-    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
+	g_camera.RotateYaw(16);
+//    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
+//    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
+//    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
 
 	criaTriangulo();
 }
@@ -740,12 +754,12 @@ void excluirPonto(int grupo) //Apaga os pontos
     }
 }
 
-void imprimeTitulo(int grupo, int altura, int espessura, int material)
+void imprimeTitulo(int grupo, float altura, int espessura, int material)
 {
     char aux[128];
     static char fpsBuf[256] = {0};
-    sprintf(aux, "Grupo: %i, Altura: %i, Espessura: %i , Material: %i ", grupo, altura,espessura, material);
-    strcpy(fpsBuf, "Desenvolvimento 1 - ");
+    sprintf(aux, "Grupo: %i, Altura: %.2f, Espessura: %i , Material: %i ", grupo, altura,espessura, material);
+    strcpy(fpsBuf, "Trabalho 3 - ");
     strcat(fpsBuf, aux);
     strcat(fpsBuf, "- Press ESC to exit.");
     glutSetWindowTitle(fpsBuf);
@@ -769,6 +783,7 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
 
         desenhaEixos(); //Desenha os eixos em 2D
+        desenhaCirculo();
         glEnable(GL_POINT_SMOOTH); //Para suavizar os pontos
         desenhaPontos(); //Desenha os pontos no 2D
 
@@ -812,8 +827,8 @@ void display(void)
         g_camera.Refresh();
 
         // Seleciona a textura corrente
-        textureManager->Bind(selected);
-        float aspectRatio = textureManager->GetAspectRatio(selected);
+//        textureManager->Bind(selected);
+//        float aspectRatio = textureManager->GetAspectRatio(selected);
 
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
@@ -847,7 +862,7 @@ void display(void)
         glutSetWindowTitle("T3 - Ambiente Virtual - Press ESC to exit.");
     }
     // Desabilita o uso de texturas
-    textureManager->Disable();
+//    textureManager->Disable();
 }
 
 void idle ()
@@ -984,13 +999,13 @@ void specialKeys(int key, int x, int y)
             grupo += 1;
             break;
         case GLUT_KEY_UP:
-            altura += 1;
+            altura += alturaUsuario/2;
             break;
         case GLUT_KEY_DOWN:
-            if(altura <= 1)
-                altura = 1;
+            if(altura <= 0)
+                altura = 0;
             else
-                altura -= 1;
+                altura -= alturaUsuario/2;
             break;
         case GLUT_KEY_F12:
             (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
@@ -1083,7 +1098,7 @@ void mouse(int button, int state, int x, int y)
             vertice v;
             v.x=(((float)x*4)/(float)width)-1; //Normalização da coordenada X
             v.y=((((float)y*2)/(float)height)-1)*-1; //Normalização da coordenada Y
-            v.z = (float) altura/5;
+            v.z = (float) altura;
             if(vetorGrupos.size() < grupo)
             {
                 vetorGrupos.resize(grupo);

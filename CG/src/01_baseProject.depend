@@ -55,7 +55,7 @@
 1555444742 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcFPSViewer.h
 	"glcFPSViewer.h"
 
-1558999288 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
+1561668464 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -70,6 +70,7 @@
 	<sstream>
 	"camera.h"
 	"extras.h"
+	"glcTexture.h"
 
 1554843147 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/extras1.h
 
@@ -132,5 +133,16 @@
 	"glcTexture.h"
 
 1557232835 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcTexture.h
+	<string>
+
+1561663875 source:/home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcTexture.cpp
+	<string>
+	<stdio.h>
+	<malloc.h>
+	"GL/glut.h"
+	"png.h"
+	"glcTexture.h"
+
+1561663875 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcTexture.h
 	<string>
 
