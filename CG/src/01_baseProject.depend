@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1561742419 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1561746329 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -34,6 +34,7 @@
 	"camera.h"
 	"extras.h"
 	"glcTexture.h"
+	"glcWavefrontObject.h"
 
 1554837721 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/extras1.h
 
@@ -145,4 +146,17 @@
 
 1561663875 /home/thay/Meus Arquivos/UFJF/CG/Desenvolvimento1-CG/CG/src/glcTexture.h
 	<string>
+
+1557232835 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcWavefrontObject.cpp
+	"glcWavefrontObject.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+
+1557232835 /home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/glcWavefrontObject.h
+	<math.h>
+	<stdio.h>
+	<GL/gl.h>
 

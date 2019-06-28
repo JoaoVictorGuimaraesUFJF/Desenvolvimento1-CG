@@ -14,6 +14,8 @@
 #include "camera.h"
 #include "extras.h"
 #include "glcTexture.h"
+#include "glcWavefrontObject.h"
+#define NUM_OBJECTS 7
 
 /// Estruturas iniciais para armazenar vertices
 //  Você poderá utilizá-las adicionando novos métodos (de acesso por exemplo) ou usar suas próprias estruturas.
@@ -36,8 +38,35 @@ public:
     float x,y,z;
 };
 
+
+char objectFiles[NUM_OBJECTS][50] =
+{
+    "../data/texturedObj/littleCow.obj",
+    "../data/texturedObj/duck.obj",
+    "../data/texturedObj/fish.obj",
+    "../data/texturedObj/L200.obj",
+    "../data/texturedObj/plane.obj",
+    "../data/texturedObj/Florest_Guardian.obj",
+    "../data/texturedObj/BlueDragon.obj"
+};
+
+char textureFiles[NUM_OBJECTS][50] =
+{
+    "../data/texturedObj/littleCow.png",
+    "../data/texturedObj/duck.png",
+    "../data/texturedObj/fish.png",
+    "../data/texturedObj/L200.png",
+    "../data/texturedObj/plane.png",
+    "../data/texturedObj/Florest_Guardian.png",
+    "../data/texturedObj/BlueDragon.png"
+};
+
 // Aqui é criada a referência ao objeto que gerenciará as texturas
 glcTexture *textureManager;
+glcTexture *textureManager1;
+
+glcWavefrontObject *objectManager = NULL;
+
 int selected = 0;
 
 /// Globals
@@ -58,15 +87,6 @@ std::string nomeArquivo;
 std::vector< std::vector<triangle> > triangulosGrupos; //vetor para armazenar triângulos
 std::vector<int> materiaisGrupos;
 std::vector< std::vector<vertice> > vetorGrupos; //Estrutura utilizada para armazenar os vértices
-
-//Ler .ply
-int quantVerticesPly = 0;
-int quantFacesPly = 0;
-std::vector< vertice > verticesPly; //Estrutura utilizada para armazenar os vértices
-std::vector< std::vector<triangle> > vetorPly; //Estrutura utilizada para armazenar os objetos Ply disponiveis
-
-//Desenhar Ply
-std::vector< objeto > vetorObjetos; //Estrutura utilizada para armazenar os objetos Ply disponiveis
 
 //Camera
 Camera g_camera;
@@ -140,9 +160,31 @@ void init(void)
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
 	g_camera.RotateYaw(16);
-    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
-    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
-    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
+
+	//LOAD TEXTURES WALLS
+    textureManager1 = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
+    textureManager1->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
+    textureManager1->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
+
+    // LOAD TEXTURES OBJECTS
+    textureManager = new glcTexture();
+    textureManager->SetNumberOfTextures(NUM_OBJECTS);
+    textureManager->SetWrappingMode(GL_REPEAT);
+    for(int i = 0; i < NUM_OBJECTS; i++)
+        textureManager->CreateTexture( textureFiles[i], i);
+
+    // LOAD OBJECTS
+    objectManager = new glcWavefrontObject();
+    objectManager->SetNumberOfObjects(NUM_OBJECTS);
+    for(int i = 0; i < NUM_OBJECTS; i++)
+    {
+        objectManager->SelectObject(i);
+        objectManager->ReadObject(objectFiles[i]);
+        objectManager->Unitize();
+        objectManager->FacetNormal();
+        objectManager->VertexNormals(90.0);
+        objectManager->Scale(5);
+    }
 
 	criaTriangulo();
 }
@@ -169,8 +211,6 @@ void salvarModelo(std::string outFileName)
         }
         outFile << quantGrupos << std::endl;
 
-        outFile << vetorObjetos.size() << std::endl;
-
         for(int i=0; i<vetorGrupos.size(); i++) //percorre os grupos
         {
             if(!vetorGrupos.at(i).empty())
@@ -193,13 +233,6 @@ void salvarModelo(std::string outFileName)
                 }
                 outFile << std::endl;
             }
-        }
-
-        for(int i=0; i<vetorObjetos.size(); i++) //percorre os objetos
-        {
-            outFile << vetorObjetos.at(i).id << ";" << vetorObjetos.at(i).material << ";" << vetorObjetos.at(i).orientacao << ";";
-            outFile << vetorObjetos.at(i).x << ";" << vetorObjetos.at(i).y << ";" << vetorObjetos.at(i).z << ";";
-            outFile << std::endl;
         }
 
         outFile.close();
@@ -230,7 +263,6 @@ void carregarModelo(std::string inFileName)
     {
         vetorGrupos.clear();
         materiaisGrupos.clear();
-        vetorObjetos.clear();
         std::string line;
         std::vector<std::string> data;
         int quantGrupos=0, grupoAtual=0, quantObjetos=0;
@@ -271,117 +303,9 @@ void carregarModelo(std::string inFileName)
             }
         }
 
-        int i=0;
-        while (i<quantObjetos)
-        {
-            std::getline(inFile, line);
-            if(!line.empty())
-            {
-                data = explode(line, ';');
-                objeto obj;
-                obj.id = std::stoi (data[0]);
-                obj.material = std::stoi (data[1]);
-                obj.orientacao = std::stoi (data[2]);
-                obj.x = std::stof (data[3]);
-                obj.y = std::stof (data[4]);
-                obj.z = std::stof (data[5]);
-                vetorObjetos.push_back(obj);
-                i++;
-            }
-        }
-
         inFile.close();
         std::cout << "Modelo carregado com sucesso!" << std::endl;
     }
-}
-
-void carregaPLY(std::string inFileName, int id)
-{
-    std::ifstream inFile("../plyObjects/" + inFileName);
-
-    if (!inFile.is_open())
-    {
-        std::cout << "Falha na leitura do arquivo" << std::endl;
-    }
-    else
-    {
-        verticesPly.clear();
-        std::string line;
-        std::vector<std::string> data;
-
-        while (std::getline(inFile, line) && line!="end_header") //Lê cabeçalho
-        {
-            if(!line.empty())
-            {
-                data = explode(line, ' ');
-                if (data[0] == "element")
-                {
-                    if (data[1] == "vertex")
-                    {
-                        quantVerticesPly = std::stoi(data[2]);
-
-                    }
-                    else if (data[1] == "face")
-                    {
-                        quantFacesPly = std::stoi(data[2]);
-                    }
-                }
-            }
-        }
-
-
-        for(int i = 0; i < quantVerticesPly; i++)
-        {
-            std::getline(inFile, line);
-            data = explode(line, ' ');
-            vertice v;
-            v.x = std::stof (data[0]);
-            v.y = std::stof (data[1]);
-            v.z = std::stof (data[2]);
-            verticesPly.push_back(v);
-        }
-
-        for(int i = 0; i < quantFacesPly; i++)
-        {
-            std::getline(inFile, line);
-            data = explode(line, ' ');
-            triangle tri;
-            if(data[0] == "3")
-            {
-                tri.v[0] = verticesPly.at(std::stoi(data[1]));
-                tri.v[1] = verticesPly.at(std::stoi(data[2]));
-                tri.v[2] = verticesPly.at(std::stoi(data[3]));
-                vetorPly.at(id).push_back(tri);
-            }
-            else if (data[0] == "4")
-            {
-                tri.v[0] = verticesPly.at(std::stoi(data[1]));
-                tri.v[1] = verticesPly.at(std::stoi(data[2]));
-                tri.v[2] = verticesPly.at(std::stoi(data[3]));
-                vetorPly.at(id).push_back(tri);
-
-                tri.v[0] = verticesPly.at(std::stoi(data[1]));
-                tri.v[1] = verticesPly.at(std::stoi(data[3]));
-                tri.v[2] = verticesPly.at(std::stoi(data[4]));
-                vetorPly.at(id).push_back(tri);
-            }
-        }
-
-    }
-    inFile.close();
-    std::cout << "Ply carregado com sucesso!" << std::endl;
-}
-
-void adicionaPLY(int id, int material, float x, float y, float z, int orientacao){
-    objeto obj;
-    obj.id = id;
-    obj.material = material;
-    obj.x = x;
-    obj.y = y;
-    obj.z = z;
-    obj.orientacao = orientacao;
-    vetorObjetos.push_back(obj);
-    std::cout << "Ply posicionado!" << std::endl;
 }
 
 /* Exemplo de cálculo de vetor normal que são definidos a partir dos vértices do triângulo;
@@ -630,39 +554,6 @@ void drawObject()
     }
 }
 
-void drawObjectPly(int id)
-{
-    vertice vetorNormal;
-
-    if(id == 0){
-        glScalef(0.1,0.1,0.1);
-    }else if(id == 1){
-        glTranslatef(0.0,0.5,0.0);
-        glScalef(0.1,0.1,0.1);
-    }else if(id == 2){
-        glRotatef(-90,1.0,0.0,0.0);
-        glTranslatef(0.0,0.0,0.05);
-        glScalef(0.001,0.001,0.001);
-    }else if(id == 3){
-        glScalef(0.2,0.2,0.2);
-    }else if(id == 4){
-        glScalef(0.04,0.04,0.04);
-    }else if(id == 5){
-        glRotatef(-90,1.0,0.0,0.0);
-        glTranslatef(0.0,0.0,0.1);
-        glScalef(0.00001,0.00001,0.00001);
-    }
-    glBegin(GL_TRIANGLES);
-    for(int i = 0; i < vetorPly.at(id).size(); i++) // triangulos
-    {
-        CalculaNormal(vetorPly.at(id).at(i), &vetorNormal); // Passa face triangular e endereço do vetor normal de saída
-        glNormal3f(vetorNormal.x, vetorNormal.y,vetorNormal.z);
-        for(int j = 0; j < 3; j++) // vertices do triangulo
-            glVertex3d(vetorPly.at(id).at(i).v[j].x,vetorPly.at(id).at(i).v[j].y, vetorPly.at(id).at(i).v[j].z);
-    }
-    glEnd();
-}
-
 void desenhaEixos() //Desenha os eixos
 {
     glDisable(GL_LIGHTING); ///X VERMELHO
@@ -811,9 +702,8 @@ void display(void)
         glLoadIdentity(); //Matriz identidade
         g_camera.Refresh();
 
-        // Seleciona a textura corrente
-        textureManager->Bind(selected);
-        float aspectRatio = textureManager->GetAspectRatio(selected);
+        //Seleciona a textura da parede
+        textureManager1->Bind(0);
 
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
@@ -830,24 +720,28 @@ void display(void)
             glPopMatrix();
         glPopMatrix(); //Descarta a matriz no topo da pilha
 
+        // Seleciona a textura corrente do objeto
+        textureManager->Bind(selected);
 
-
-        for(int i=0; i<vetorObjetos.size(); i++)
-        {
-            setMaterials(vetorObjetos.at(i).material);
-            glPushMatrix();
-                glTranslatef (vetorObjetos.at(i).x, 0.0, vetorObjetos.at(i).z);
-                glRotatef(vetorObjetos.at(i).orientacao, 0.0, 1.0, 0.0 ); //Rotaciona o objeto em 3D
-                drawObjectPly(vetorObjetos.at(i).id); //Desenha o objeto ply
-            glPopMatrix();
-        }
+        // Use selected Object
+        objectManager->SelectObject(selected);
+        objectManager->SetShadingMode(SMOOTH_SHADING); // Alternative: FLAT_SHADING
+        objectManager->SetRenderMode(USE_TEXTURE_AND_MATERIAL);
+        objectManager->Unitize();
+        glPushMatrix();
+            glTranslatef(0.0,0.25,0.0);
+            glScalef(0.5,0.5,0.5);
+            objectManager->Draw();
+        glPopMatrix();
 
         glutSwapBuffers(); //Troca os buffers
 
         glutSetWindowTitle("T3 - Ambiente Virtual - Press ESC to exit.");
     }
     // Desabilita o uso de texturas
+    textureManager1->Disable();
     textureManager->Disable();
+
 }
 
 void idle ()
@@ -898,42 +792,6 @@ void keyboard (unsigned char key, int x, int y)
                 edicao = false;
             else
                 edicao = true;
-            break;
-        case 'p':
-            float x, y, z;
-            int id, orientacao;
-            char aux;
-            printf("Lista de arquivos .ply carregados: \n");
-            printf("ID - Figura\n");
-            printf("1 - Maça\n2 - Arvore\n");
-            printf("3 - Lata de lixo\n4 - Coelho\n5 - Vaca\n");
-            printf("Digite o ID do arquivo .ply a ser lido: \n");
-            std::cin >> id;
-            if(id<1||id>5)
-            {
-                printf("Valor inválido!\n");
-                break;
-            }
-            printf("O chão em X é de -1 a 1 e em Z é de -1 a 1: \n");
-            printf("Digite a posição em X em que o .ply deve ficar: \n");
-            std::cin >> x;
-            if(x<-1||x>1)
-            {
-                printf("Valor inválido!\n");
-                break;
-            }
-            printf("Digite a posição em Z em que o .ply deve ficar: \n");
-            std::cin >> z;
-            if(z<-1||z>1)
-            {
-                printf("Valor inválido!\n");
-                break;
-            }
-            y = 0;
-            printf("Digite a orientação (em ângulos) do .ply: \n");
-            std::cin >> orientacao;
-
-            adicionaPLY(id-1,material,x,y,z,orientacao);
             break;
         case 'x':
             if(material >= 6)
@@ -1005,6 +863,16 @@ void specialKeys(int key, int x, int y)
         case GLUT_KEY_F12:
             (!fullScreen) ? glutFullScreen() : glutReshapeWindow(800, 400);
             fullScreen = !fullScreen;
+            break;
+        case GLUT_KEY_RIGHT:
+            selected++;
+            if(selected >= NUM_OBJECTS)
+                selected = 0;
+            break;
+        case GLUT_KEY_LEFT:
+            selected--;
+            if(selected < 0)
+                selected = NUM_OBJECTS-1;
             break;
         }
     }
@@ -1134,13 +1002,6 @@ int main(int argc, char** argv)
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
     init ();
-
-    vetorPly.resize(5);
-    carregaPLY("apple.ply", 0);
-    carregaPLY("fracttree.ply", 1);
-    carregaPLY("trashcan.ply", 2);
-    carregaPLY("bunny.ply", 3);
-    carregaPLY("cow.ply", 4);
 
     showMenu();
 
