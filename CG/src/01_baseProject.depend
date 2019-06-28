@@ -18,7 +18,7 @@
 
 1554143668 /home/joaovictor/cg2019-1/CG/src/extras1.h
 
-1561472070 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
+1561742419 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/main.cpp
 	<GL/glut.h>
 	<stdlib.h>
 	<stdio.h>
@@ -108,7 +108,7 @@
 	<sstream>
 	"extras.h"
 
-1558800969 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/camera.cpp
+1561726681 source:/home/joaovictor/cg2019-1/Desenvolvimento1-CG/CG/src/camera.cpp
 	<stdio.h>
 	<math.h>
 	<GL/glut.h>

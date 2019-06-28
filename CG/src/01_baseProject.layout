@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
+	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="29354" topLine="796" />
-		</Cursor>
-		<Folding>
-			<Collapse line="20" />
-			<Collapse line="26" />
-			<Collapse line="32" />
-			<Collapse line="77" />
-			<Collapse line="89" />
-			<Collapse line="94" />
-			<Collapse line="99" />
-		</Folding>
-	</File>
-	<File name="glcTexture.cpp" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="glcTexture.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="5815" topLine="210" />
 		</Cursor>
@@ -24,6 +11,16 @@
 		<Cursor>
 			<Cursor1 position="881" topLine="13" />
 		</Cursor>
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2662" topLine="88" />
+		</Cursor>
+		<Folding>
+			<Collapse line="20" />
+			<Collapse line="26" />
+			<Collapse line="32" />
+		</Folding>
 	</File>
 	<File name="camera.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>

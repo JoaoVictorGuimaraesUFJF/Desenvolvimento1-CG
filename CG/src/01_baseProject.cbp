@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="T2 2019.1" />
+		<Option title="T3 2019.1" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Sources/;" />
@@ -32,6 +32,7 @@
 			<Add library="GLU" />
 			<Add library="z" />
 			<Add library="GLEW" />
+			<Add library="png" />
 		</Linker>
 		<Unit filename="camera.cpp" />
 		<Unit filename="camera.h" />

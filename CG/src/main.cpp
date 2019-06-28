@@ -102,12 +102,19 @@ void desenhaPonto3D(float x, float y, float z){
 void desenhaCilindro(){
     float h = 6*alturaUsuario;
     glBegin(GL_QUAD_STRIP);
-    for(int k = 0 ; k < 36 ; k++){
+    for(int k = 0 ; k < 3 ; k++){
+        glTexCoord2f(k/36,0);
         desenhaPonto3D(v[k].x,v[k].y,0);
+
+        glTexCoord2f(k+1/36,0);
         desenhaPonto3D(v[k+1].x,v[k+1].y,0);
 
+        glTexCoord2f(k/36,1);
         desenhaPonto3D(v[k].x,v[k].y, h);
+
+        glTexCoord2f(k+1/36,1);
         desenhaPonto3D(v[k+1].x,v[k+1].y, h);
+
     }
     glEnd();
 }
@@ -133,9 +140,9 @@ void init(void)
     initLight(width, height); // Função extra para tratar iluminação.
 	g_camera.SetPos(pos[0], pos[1], pos[2]);
 	g_camera.RotateYaw(16);
-//    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
-//    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
-//    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
+    textureManager = new glcTexture();            // Criação do arquivo que irá gerenciar as texturas
+    textureManager->SetNumberOfTextures(1);       // Estabelece o número de texturas que será utilizado
+    textureManager->CreateTexture("../data/marble.png", 0); // Para testar magnificação, usar a imagem marble128
 
 	criaTriangulo();
 }
@@ -364,28 +371,6 @@ void carregaPLY(std::string inFileName, int id)
     inFile.close();
     std::cout << "Ply carregado com sucesso!" << std::endl;
 }
-
-//void calculaBoundingBox(int id){
-//    //min = Coordenada minima do bounding box
-//    //max = Coordenada maxima do bounding box
-//    vertice min = vetorPly.at(id).at(0).v[0];
-//    vertice max = vetorPly.at(id).at(0).v[0];
-//
-//    for (int i = 0; i < vetorPly.at(id).size(); ++i)
-//    {
-//        for(int j = 0; j < 3; j++)
-//        {
-//            if ( vetorPly.at(id).at(i).v[j].x < min.x ) min.x = vetorPly.at(id).at(i).v[j].x;
-//            if ( vetorPly.at(id).at(i).v[j].y < min.y ) min.y = vetorPly.at(id).at(i).v[j].y;
-//            if ( vetorPly.at(id).at(i).v[j].z < min.z ) min.z = vetorPly.at(id).at(i).v[j].z;
-//            if ( vetorPly.at(id).at(i).v[j].x > max.x ) max.x = vetorPly.at(id).at(i).v[j].x;
-//            if ( vetorPly.at(id).at(i).v[j].y > max.y ) max.y = vetorPly.at(id).at(i).v[j].y;
-//            if ( vetorPly.at(id).at(i).v[j].z > max.z ) max.z = vetorPly.at(id).at(i).v[j].z;
-//        }
-//    }
-//
-//    alturaPly = max.y - min.y;
-//}
 
 void adicionaPLY(int id, int material, float x, float y, float z, int orientacao){
     objeto obj;
@@ -827,8 +812,8 @@ void display(void)
         g_camera.Refresh();
 
         // Seleciona a textura corrente
-//        textureManager->Bind(selected);
-//        float aspectRatio = textureManager->GetAspectRatio(selected);
+        textureManager->Bind(selected);
+        float aspectRatio = textureManager->GetAspectRatio(selected);
 
         setMaterials(0);
         glPushMatrix(); //Adiciona a matriz em uso no topo da pilha
@@ -862,7 +847,7 @@ void display(void)
         glutSetWindowTitle("T3 - Ambiente Virtual - Press ESC to exit.");
     }
     // Desabilita o uso de texturas
-//    textureManager->Disable();
+    textureManager->Disable();
 }
 
 void idle ()
